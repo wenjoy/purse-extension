@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Dropdown from '../../components/dropdown'
 import Navbar from '../../components/navbar'
 import Copy from '../../components/copy'
+import Drawer from '../../components/drawer'
 
 interface Account {
   name: string,
@@ -43,13 +44,18 @@ function App() {
     { name: 'Setting' },
   ]
   const currentAccount = accounts[0]
+  const [visible, setVisible ]= useState(false)
+
   const copyHandler = () => {
     navigator.clipboard.writeText(String(currentAccount.address)).then(() => {alert('Copied')}).catch(() => {
       alert('Copy failed')
     })
   }
-  const addHandler = () => {
-    alert('add clicked')
+  const showDrawer = () => {
+    setVisible(true)
+  }
+  const hideDrawer = () => {
+    setVisible(false)
   }
 
   return (
@@ -57,7 +63,7 @@ function App() {
       <section className="w-full shadow-md py-2.5 flex justify-around items-center">
         <span className='flex items-center justify-between'>
           {/* {name} {address} */}
-          <Dropdown onAdd={addHandler} />
+          <Dropdown onAdd={showDrawer} />
           <Copy onClick={copyHandler} />
         </span>
         <span>{icon} {netwokName}</span>
@@ -70,6 +76,10 @@ function App() {
       <section className="w-full flex justify-around">
         {navbar.map(({ name }) => <Navbar name={name} />)}
       </section>
+      <Drawer visible={visible} onClick={hideDrawer}>
+        <button className='btn'>Create a new account</button>
+        <button className='btn'>Import from private key</button>
+      </Drawer>
     </div>
   )
 }

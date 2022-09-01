@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.btn {
+  @apply bg-gray-400 rounded-md px-2 py-0.5 w-full;
+}
+
+@keyframes showup {
+  from {
+    @apply -bottom-20;
+  } 
+  to {
+    @apply bottom-0;
+  }
+}
