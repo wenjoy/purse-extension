@@ -48,13 +48,16 @@ function App() {
       alert('Copy failed')
     })
   }
+  const addHandler = () => {
+    alert('add clicked')
+  }
 
   return (
     <div className="container h-full py-2.5 flex flex-col">
       <section className="w-full shadow-md py-2.5 flex justify-around items-center">
         <span className='flex items-center justify-between'>
           {/* {name} {address} */}
-          <Dropdown />
+          <Dropdown onAdd={addHandler} />
           <Copy onClick={copyHandler} />
         </span>
         <span>{icon} {netwokName}</span>

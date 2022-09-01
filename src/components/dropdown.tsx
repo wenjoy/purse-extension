@@ -3,25 +3,16 @@ import cls from 'classnames'
 import IconDown from './icons/icon-down'
 import IconUp from './icons/icon-up'
 
-interface Props {
-  data?: []
-}
-
-const data = [
-  { id: 1, name: 'andrease', address: '0x1001200120012001' },
-  { id: 2, name: 'bbkddkkk', address: '0x2001200120012001' },
-  { id: 3, name: 'caldown', address: '0x8001200120012001' },
-]
-const selectedId = 1
-
 interface ItemProps {
-  selected: boolean
-  children: React.ReactElement
+  className?: string
+  selected?: boolean
+  children?: React.ReactNode
   onClick?: () => void
 }
 
-const DropdownItem: React.FC<ItemProps> = ({ selected, children, onClick }) => {
+const DropdownItem: React.FC<ItemProps> = ({ className, selected, children, onClick }) => {
   return <div className={cls(
+    className,
     'hover:bg-gray-200',
     'cursor-pointer',
     {
@@ -33,7 +24,19 @@ const DropdownItem: React.FC<ItemProps> = ({ selected, children, onClick }) => {
   </div>
 }
 
-const Dropdown: React.FC<Props> = () => {
+
+
+const data = [
+  { id: 1, name: 'andrease', address: '0x1001200120012001' },
+  { id: 2, name: 'bbkddkkk', address: '0x2001200120012001' },
+  { id: 3, name: 'caldown', address: '0x8001200120012001' },
+]
+const selectedId = 1
+interface Props {
+  data?: []
+  onAdd?: () => void
+}
+const Dropdown: React.FC<Props> = ({onAdd}) => {
   const [expanded, setExpaned] = useState(false)
   const [selectedId, setSelectedId] = useState(1)
   const selected = data.find(({ id }) => id === selectedId)
@@ -60,13 +63,16 @@ const Dropdown: React.FC<Props> = () => {
     </div>
 
     {expanded &&
-      <div className='absolute top-6 left-0 py-1 space-y-1 bg-white shadow-md rounded'>
+      <div className='absolute top-6 left-0 px-1 py-2 space-y-1 bg-white shadow-md rounded'>
         {data.map(({ name, address, id }) =>
           <DropdownItem
             onClick={() => clickHandler(id)}
             selected={id === selectedId}>
             <span>{name} {address}</span>
           </DropdownItem>)}
+          <DropdownItem className="flex justify-center hover:bg-white">
+            <span onClick={onAdd} className='border rounded-lg px-1 shadow-sm text-white bg-slate-600 active:bg-slate-500 hover:bg-slate-400 select-none'>Add a new account</span>
+          </DropdownItem>
       </div>
     }
   </div>
