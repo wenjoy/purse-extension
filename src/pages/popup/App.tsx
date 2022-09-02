@@ -54,6 +54,7 @@ function App() {
   const showDrawer = () => {
     setVisible(true)
   }
+
   const hideDrawer = () => {
     setVisible(false)
   }
@@ -76,7 +77,7 @@ function App() {
       <section className="w-full flex justify-around">
         {navbar.map(({ name }) => <Navbar name={name} />)}
       </section>
-      <Drawer visible={visible} onClick={hideDrawer}>
+      <Drawer visible={visible} onClose={hideDrawer}>
         <button className='btn'>Create a new account</button>
         <button className='btn'>Import from private key</button>
       </Drawer>

@@ -6,11 +6,20 @@
   @apply bg-gray-400 rounded-md px-2 py-0.5 w-full;
 }
 
-@keyframes showup {
+@keyframes fade-in {
   from {
     @apply -bottom-20;
   } 
   to {
     @apply bottom-0;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    @apply bottom-0;
+  } 
+  to {
+    @apply -bottom-20;
   }
 }
