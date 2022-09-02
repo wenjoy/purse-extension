@@ -1,5 +1,5 @@
 import cls from 'classnames';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   visible: boolean
@@ -10,6 +10,7 @@ interface Props {
 const Drawer = ({ visible: _visible, children, onClose }: Props) => {
   const [visible, setVisible] = useState(_visible)
   const [fade, setFade] = useState(false)
+  const containerRef = useRef(null)
 
   useEffect(() => {
     setVisible(_visible)
@@ -19,7 +20,11 @@ const Drawer = ({ visible: _visible, children, onClose }: Props) => {
     setFade(visible)
   }, [visible])
 
-  const hide = () => {
+  const hide = (e: React.MouseEvent<HTMLElement>) => {
+    if(e.target !== containerRef.current) {
+      return false
+    }
+
     setFade(false)
 
     setTimeout(() => {
@@ -34,6 +39,7 @@ const Drawer = ({ visible: _visible, children, onClose }: Props) => {
     'fixed left-0 bottom-0 backdrop-blur-sm w-full h-full',
   )}
     onClick={hide}
+    ref={containerRef}
   >
     <div className={cls(
       'absolute bottom-0 left-0 border-solid border-t-2 border-gray-700 p-2.5 bg-white w-full h-auto space-y-2',
