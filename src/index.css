@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .btn {
-  @apply bg-gray-400 rounded-md px-2 py-0.5 w-full;
+  @apply bg-gray-400 rounded-md px-2 py-0.5 w-full select-none;
 }
 
 @keyframes fade-in {

@@ -3,6 +3,7 @@ import Dropdown from '../../components/dropdown'
 import Navbar from '../../components/navbar'
 import Copy from '../../components/copy'
 import Drawer from '../../components/drawer'
+import useWeb3 from '../../hooks/useWeb3'
 
 interface Account {
   name: string,
@@ -59,6 +60,12 @@ function App() {
     setVisible(false)
   }
 
+  const creatAccont = () => {
+    const web3 = useWeb3();
+    console.log(web3);
+    
+  }
+
   return (
     <div className="container h-full py-2.5 flex flex-col">
       <section className="w-full shadow-md py-2.5 flex justify-around items-center">
@@ -78,7 +85,7 @@ function App() {
         {navbar.map(({ name }) => <Navbar name={name} />)}
       </section>
       <Drawer visible={visible} onClose={hideDrawer}>
-        <button className='btn'>Create a new account</button>
+        <button className='btn' onClick={creatAccont}>Create a new account</button>
         <button className='btn'>Import from private key</button>
       </Drawer>
     </div>
