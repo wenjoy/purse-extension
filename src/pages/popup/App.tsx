@@ -4,10 +4,11 @@ import Navbar from '../../components/navbar'
 import Copy from '../../components/copy'
 import Drawer from '../../components/drawer'
 import useWeb3 from '../../hooks/useWeb3'
+import truncate from '../../utils/truncate'
 
 interface Account {
   name: string,
-  address: number
+  address: string
 }
 
 interface Network {
@@ -22,11 +23,26 @@ interface Network {
 function App() {
   const accounts: Account[] = []
   const networks: Network[] = []
-  const balance = 100
+  const web3 = useWeb3()
+
+  // TODO: jump to create wallet
   accounts.push({
     name: 'Account1',
-    address: 0x100000101
+    address: '0x100000101'
   })
+  const wallet = web3.eth.accounts.wallet
+  
+  for (let i = 0; i < wallet.length; i++) {
+    const element = wallet[i];
+    accounts.push({
+      name: `Wallet ${i+1}`,
+      address: truncate(element.address)
+    })
+  }
+
+  const [selected, setSelected] = useState(accounts[0].address)
+
+  const balance = 100
 
   networks.push({
     name: 'ethereum',
@@ -36,7 +52,6 @@ function App() {
     icon: 'E'
   })
 
-  const { name, address } = accounts[0]
   const { name: netwokName, icon, symbol } = networks[0]
   const navbar = [
     { name: 'Token' },
@@ -44,11 +59,11 @@ function App() {
     { name: 'Transaction' },
     { name: 'Setting' },
   ]
-  const currentAccount = accounts[0]
+  const currentAccount = accounts.find(({address}) => address === selected)
   const [visible, setVisible ]= useState(false)
 
   const copyHandler = () => {
-    navigator.clipboard.writeText(String(currentAccount.address)).then(() => {alert('Copied')}).catch(() => {
+    navigator.clipboard.writeText(String(currentAccount!.address)).then(() => {alert('Copied')}).catch(() => {
       alert('Copy failed')
     })
   }
@@ -61,17 +76,21 @@ function App() {
   }
 
   const creatAccont = () => {
-    const web3 = useWeb3();
-    console.log(web3);
-    
+    web3.eth.accounts.wallet.create(1)
+    hideDrawer()
   }
+
+  const selectHandler = (id: string) => {
+    setSelected(id)
+  }
+
+  const options = accounts.map(({name, address})=>({label: name, value: address}))
 
   return (
     <div className="container h-full py-2.5 flex flex-col">
       <section className="w-full shadow-md py-2.5 flex justify-around items-center">
         <span className='flex items-center justify-between'>
-          {/* {name} {address} */}
-          <Dropdown onAdd={showDrawer} />
+          <Dropdown selected={selected} data={options} onAdd={showDrawer} onSelect={selectHandler} />
           <Copy onClick={copyHandler} />
         </span>
         <span>{icon} {netwokName}</span>

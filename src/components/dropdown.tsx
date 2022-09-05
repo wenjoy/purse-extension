@@ -24,27 +24,26 @@ const DropdownItem: React.FC<ItemProps> = ({ className, selected, children, onCl
   </div>
 }
 
+interface Option {
+  label: string,
+  value: string
+}
 
-
-const data = [
-  { id: 1, name: 'andrease', address: '0x1001200120012001' },
-  { id: 2, name: 'bbkddkkk', address: '0x2001200120012001' },
-  { id: 3, name: 'caldown', address: '0x8001200120012001' },
-]
-const selectedId = 1
 interface Props {
-  data?: []
+  data?: Option[]
+  selected?: string
+  onSelect: (id: string) => void
   onAdd?: () => void
 }
-const Dropdown: React.FC<Props> = ({onAdd}) => {
+const Dropdown: React.FC<Props> = ({onAdd, onSelect, data = [], selected: selected_}) => {
   const [expanded, setExpaned] = useState(false)
-  const [selectedId, setSelectedId] = useState(1)
-  const selected = data.find(({ id }) => id === selectedId)
+  const selected = data.find(({ value }) => value === selected_) || data[0]
 
-  const clickHandler = (id: number) => {
+  const clickHandler = (id: string) => {
     setExpaned(false)
-    setSelectedId(id)
+    onSelect(id)
   }
+
   const toggle = () => {
     setExpaned(!expanded)
   }
@@ -52,8 +51,8 @@ const Dropdown: React.FC<Props> = ({onAdd}) => {
   return <div className='container relative'>
     <div className='flex cursor-pointer items-center' onClick={toggle}>
       <span className='select-none space-x-1'>
-        <span> {selected!.name} </span>
-        <span> {selected!.address} </span>
+        <span> {selected!.label} </span>
+        <span> {selected!.value} </span>
       </span>
       {
         expanded
@@ -64,11 +63,11 @@ const Dropdown: React.FC<Props> = ({onAdd}) => {
 
     {expanded &&
       <div className='absolute top-6 left-0 px-1 py-2 space-y-1 bg-white shadow-md rounded'>
-        {data.map(({ name, address, id }) =>
+        {data.map(({ label, value}) =>
           <DropdownItem
-            onClick={() => clickHandler(id)}
-            selected={id === selectedId}>
-            <span>{name} {address}</span>
+            onClick={() => clickHandler(value)}
+            selected={value === selected_}>
+            <span>{label} {value}</span>
           </DropdownItem>)}
           <DropdownItem className="flex justify-center hover:bg-white">
             <span onClick={onAdd} className='border rounded-lg px-1 shadow-sm text-white bg-slate-600 active:bg-slate-500 hover:bg-slate-400 select-none'>Add a new account</span>
