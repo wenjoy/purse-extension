@@ -8,6 +8,7 @@ specifiers:
   browserify-zlib: ^0.2.0
   buffer: ^6.0.3
   classnames: ^2.3.1
+  crypto: ^1.0.1
   events: ^3.3.0
   path: ^0.12.7
   postcss: ^8.4.16
@@ -23,6 +24,7 @@ specifiers:
 
 dependencies:
   buffer: 6.0.3
+  crypto: 1.0.1
   events: 3.3.0
   path: 0.12.7
   process: 0.11.10
@@ -1189,6 +1191,11 @@ packages:
       public-encrypt: 4.0.3
       randombytes: 2.1.0
       randomfill: 1.0.4
+    dev: false
+
+  /crypto/1.0.1:
+    resolution: {integrity: sha512-VxBKmeNcqQdiUQUW2Tzq0t377b54N2bMtXO/qiLa+6eRRmmC4qT3D4OnTGoT/U6O9aklQ/jTwbOtRMTTY8G0Ig==}
+    deprecated: This package is no longer supported. It's now a built-in Node module. If you've depended on crypto, you should switch to the one that's built-in.
     dev: false
 
   /cssesc/3.0.0:
