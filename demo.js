@@ -20,6 +20,15 @@ function sha256(input) {
   return crypto.createHash('sha256').update(input).digest()
 }
 
+function rmd160(input) {
+  return crypto.createHash('rmd160').update(input).digest()
+}
+
+function createFigerprint(input) {
+  const hash160 = rmd160(sha256(input))
+  return hash160.slice(0, 4)
+}
+
 // function sha512(input) {
 //   return crypto.createHash('sha512').update(input).digest()
 // }
@@ -78,13 +87,9 @@ function hmac(input, key) {
   return crypto.createHmac('sha512', key).update(input).digest('hex')
 }
 
-function buf2Hex(arrayBuffer) {
-  return [...arrayBuffer].map((x) => x.toString(16).padStart(2, '0')).join('')
-}
-
 function derivePubKeyFromPrvKey(prvKey) {
   const buf = Buffer.from(prvKey, 'hex')
-  return buf2Hex(secp256k1.publicKeyCreate(buf))
+  return Buffer.from(secp256k1.publicKeyCreate(buf)).toString('hex')
 }
 
 function generateMasterkey(seed) {
@@ -99,22 +104,22 @@ function generateMasterkey(seed) {
   // console.log('mater chain code: ', masterChainCode);
 
   const masterPublicKey = derivePubKeyFromPrvKey(masterPrivateKey)
-  return [masterPrivateKey, buf2Hex(masterPublicKey), masterChainCode]
+  return [masterPrivateKey, masterPublicKey, masterChainCode]
 }
 
 function normalChildPrvKeyDerivation(parentPubKeyWithIndex, chainCode, parentPrvKey) {
+  console.log('parentPubKeyWithIndex: ', parentPubKeyWithIndex);
   // js Number.MAX_SAFE_INTEGER is 2 ** 53 -1 = 9007199254740991 
   // console.log('normal child prv key======================');
   const ORDER_OF_CURVE = BigInt('115792089237316195423570985008687907852837564279074904382605163141518161494337')
-  const hash = hmac(parentPubKeyWithIndex, chainCode)
+  const hash = hmac(Buffer.from(parentPubKeyWithIndex, 'hex'), Buffer.from(chainCode, 'hex'))
   const childPrvKey = (BigInt(`0x${parentPrvKey}`) + BigInt(`0x${hash.slice(0, 64)}`)) % ORDER_OF_CURVE
-  // console.log('normal child Prv Key: ', childPrvKey.toString(16));
   // console.log('normal child Pub Key: ', derivePubKeyFromPrvKey(childPrvKey.toString(16)));
 
   const childChainCode = hash.slice(64)
-  // console.log('child Chain Code: ', childChainCode);
-  return [childPrvKey, childChainCode]
+  return [childPrvKey.toString(16), childChainCode]
 }
+
 
 function normalChildPubKeyDerivation(parentPubKeyWithIndex, chainCode, parentPubKey) {
   // js Number.MAX_SAFE_INTEGER is 2 ** 53 -1 = 9007199254740991 
@@ -122,12 +127,10 @@ function normalChildPubKeyDerivation(parentPubKeyWithIndex, chainCode, parentPub
   const ORDER_OF_CURVE = BigInt('115792089237316195423570985008687907852837564279074904382605163141518161494337')
   const hash = hmac(parentPubKeyWithIndex, chainCode)
   const childPubKey = (BigInt(`0x${parentPubKey}`) + BigInt(`0x${hash.slice(0, 64)}`)) % ORDER_OF_CURVE
-  // console.log('normal child Pub Key: ', childPubKey.toString(16));
 
   const childChainCode = hash.slice(64)
-  // console.log('child Chain Code: ', childChainCode);
 
-  return [childPubKey, childChainCode]
+  return [childPubKey.toString(16), childChainCode]
 }
 
 function hardenedChildPrvKeyDerivation(parentPrvKeyWithIndex, chainCode) {
@@ -135,35 +138,28 @@ function hardenedChildPrvKeyDerivation(parentPrvKeyWithIndex, chainCode) {
   const ORDER_OF_CURVE = BigInt('115792089237316195423570985008687907852837564279074904382605163141518161494337')
   const hash = hmac(parentPrvKeyWithIndex, chainCode)
   const childPrvKey = (BigInt(`0x${parentPrvKeyWithIndex}`) + BigInt(`0x${hash.slice(0, 64)}`)) % ORDER_OF_CURVE
-  // console.log('hardened child Prv Key: ', childPrvKey.toString(16));
 
   const childChainCode = hash.slice(64)
-  // console.log('child Chain Code: ', childChainCode);
 
-  return [childPrvKey, childChainCode]
+  return [childPrvKey.toString(16), childChainCode]
 }
 
-function childKeyGenerator() {
+function generateChildKey(prvKey, pubKey, chainCode, index) {
   const NORMAL_CHILD_BOUNDARY = 2 ** 16
-  let index = 0
+  let prvKey_
+  let pubKey_
+  let chainCode_
+  const pubKeyWithIndex = pubKey + String(index).padStart(8, '0')
+  const prvKeyWithIndex = prvKey + String(index).padStart(8, '0')
 
-  return (prvKey, pubKey, chainCode) => {
-    let prvKey_
-    let pubKey_
-    let chainCode_
-    const pubKeyWithIndex = pubKey + String(index)
-    const prvKeyWithIndex = prvKey + String(index)
-
-    if (index < NORMAL_CHILD_BOUNDARY) {
-      [prvKey_, chainCode_] = normalChildPrvKeyDerivation(pubKeyWithIndex, chainCode, prvKey)
-      [pubKey_] = normalChildPubKeyDerivation(pubKeyWithIndex, chainCode, pubKey)
-    } else {
-      [prvKey_, chainCode_] = hardenedChildPrvKeyDerivation(prvKeyWithIndex, chainCode)
-    }
-    index++
-
-    return [prvKey_, pubKey_, chainCode_]
+  if (index < NORMAL_CHILD_BOUNDARY) {
+    ;[prvKey_, chainCode_] = normalChildPrvKeyDerivation(pubKeyWithIndex, chainCode, prvKey)
+    ;[pubKey_] = normalChildPubKeyDerivation(pubKeyWithIndex, chainCode, pubKey)
+  } else {
+    ;[prvKey_, chainCode_] = hardenedChildPrvKeyDerivation(prvKeyWithIndex, chainCode)
   }
+
+  return [prvKey_, pubKey_, chainCode_]
 }
 
 // rome-ignore lint: temp
@@ -180,13 +176,14 @@ async function generateWords() {
 }
 
 function base58Encode(input) {
+  // TODO: handle leading 00
   const code = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
   let result
 
-  if(typeof input === 'string') {
+  if (typeof input === 'string') {
     let buf = Buffer.from(input)
-    result = buf.reduce((x,y) => BigInt(x) * 256n + BigInt(y))
-  }else {
+    result = buf.reduce((x, y) => BigInt(x) * 256n + BigInt(y))
+  } else {
     result = input
   }
 
@@ -208,6 +205,7 @@ function serializeKey(version, depth, parentFingerprint, childNumber, chainCode,
   }
   // rome-ignore lint: no
   const aggregasion = versionMap[version] + depth + parentFingerprint + childNumber + chainCode + '00' + key
+  console.log('aggregasion: ', aggregasion);
   const checksum = getChecksum2(Buffer.from(aggregasion, 'hex'))
   const result = aggregasion + checksum.toString('hex')
   return base58Encode(BigInt(`0x${result}`))
@@ -222,9 +220,11 @@ async function main() {
   const rootKey = serializeKey('xprv', '00', '00000000', '00000000', chainCode, prvKey)
   console.log('rootKey: ', rootKey);
 
-  let generateChildKey = childKeyGenerator();
+  let index = 0;
+  const figerprint = createFigerprint(Buffer.from(pubKey, 'hex'))
+  ;[prvKey, pubKey, chainCode] = generateChildKey(prvKey, pubKey, chainCode, index)
 
-  [prvKey, pubKey, chainCode] = generateChildKey(prvKey, pubKey, chainCode)
+  console.log('prvKey: ', serializeKey('xprv', '01', figerprint.toString('hex'), '00000000', chainCode, prvKey));
 }
 
 main()
