@@ -24,11 +24,19 @@ function sha256(input) {
 //   return crypto.createHash('sha512').update(input).digest()
 // }
 
+function getChecksum2(input) {
+  //checksum in bitcoin is sha256 twice
+  const temp = sha256(input)
+  const result = sha256(temp)
+  return result.slice(0, 4)
+}
+
 function getENT(entroph) {
   return entroph.byteLength * 8 / 32
 }
 
 function getChecksum(hash, ENT) {
+  // only for entroph
   hash[0].toString(2).padStart(8, '0').slice(0, ENT)
 }
 
@@ -171,10 +179,16 @@ async function generateWords() {
   return words
 }
 
-function base58Encode(str) {
+function base58Encode(input) {
   const code = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-  let buf = Buffer.from(str)
-  let result = buf.reduce((x,y) => BigInt(x) * 256n + BigInt(y))
+  let result
+
+  if(typeof input === 'string') {
+    let buf = Buffer.from(input)
+    result = buf.reduce((x,y) => BigInt(x) * 256n + BigInt(y))
+  }else {
+    result = input
+  }
 
   let encoded = []
 
@@ -189,33 +203,24 @@ function base58Encode(str) {
 
 function serializeKey(version, depth, parentFingerprint, childNumber, chainCode, key) {
   const versionMap = {
-    xprev: '0488ade4',
+    xprv: '0488ade4',
     xpub: '0488b21e',
   }
   // rome-ignore lint: no
   const aggregasion = versionMap[version] + depth + parentFingerprint + childNumber + chainCode + '00' + key
-  const checksum = sha256(aggregasion).slice(0, 4)
-  const result = aggregasion + checksum
-  return result
+  const checksum = getChecksum2(Buffer.from(aggregasion, 'hex'))
+  const result = aggregasion + checksum.toString('hex')
+  return base58Encode(BigInt(`0x${result}`))
 }
 
 async function main() {
   // const words = await generateWords()
   const words = 'envelope mango blouse teach lake exclude approve ankle tragic novel milk ribbon'
   const seed = await generateSeed(words)
-  console.log('seed', seed.toString('hex'))
-
-  const masterPrvKey = seed.slice(0, 64)
-  const masterChainCode = seed.slice(64)
-
-  // console.log('debug: ', base58Encode('hi'));
-
-  const rootKey = serializeKey('xprev', '00', '00000000', '00000000', masterChainCode, masterPrvKey)
-  console.log('rootKey: ', rootKey);
-  console.log('rootKey 58: ', base58Encode(rootKey));
 
   let [prvKey, pubKey, chainCode] = generateMasterkey(seed)
-  console.log('root prv key: ', prvKey);
+  const rootKey = serializeKey('xprv', '00', '00000000', '00000000', chainCode, prvKey)
+  console.log('rootKey: ', rootKey);
 
   let generateChildKey = childKeyGenerator();
 
