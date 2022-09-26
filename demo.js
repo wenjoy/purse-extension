@@ -108,10 +108,11 @@ function generateMasterkey(seed) {
   return [masterPrivateKey, masterPublicKey, masterChainCode];
 }
 
-function normalChildPrvKeyDerivation(parentPubKeyWithIndex, chainCode, parentPrvKey) {
+function normalChildPrvKeyDerivation(parentPrvKey, parentPubKey, chainCode, index=0) {
   // js Number.MAX_SAFE_INTEGER is 2 ** 53 -1 = 9007199254740991 
   // console.log('normal child prv key======================');
   const ORDER_OF_CURVE = BigInt('115792089237316195423570985008687907852837564279074904382605163141518161494337');
+  const parentPubKeyWithIndex = `${parentPubKey}${index.toString(16).padStart(8, '0')}`;
   const hash = hmac(Buffer.from(parentPubKeyWithIndex, 'hex'), Buffer.from(chainCode, 'hex'));
   const childPrvKey = (BigInt(`0x${parentPrvKey}`) + BigInt(`0x${hash.slice(0, 64)}`)) % ORDER_OF_CURVE;
   // console.log('normal child Pub Key: ', derivePubKeyFromPrvKey(childPrvKey.toString(16)));
@@ -120,12 +121,12 @@ function normalChildPrvKeyDerivation(parentPubKeyWithIndex, chainCode, parentPrv
   return [childPrvKey.toString(16), childChainCode];
 }
 
-
-function normalChildPubKeyDerivation(parentPubKeyWithIndex, chainCode, parentPubKey) {
+function normalChildPubKeyDerivation(parentPubKey, chainCode, index=0) {
   // js Number.MAX_SAFE_INTEGER is 2 ** 53 -1 = 9007199254740991 
   // console.log('normal child pub key======================');
   const EC = elliptic.ec;
   const ec = new EC('secp256k1');
+  const parentPubKeyWithIndex = `${parentPubKey}${index.toString(16).padStart(8, '0')}`;
   const hash = hmac(Buffer.from(parentPubKeyWithIndex, 'hex'), Buffer.from(chainCode, 'hex'));
   const Il = hash.slice(0, 64);
   const prvKey = ec.keyFromPrivate(Il);
@@ -139,32 +140,30 @@ function normalChildPubKeyDerivation(parentPubKeyWithIndex, chainCode, parentPub
   return [childPubKey.encode('hex', true), childChainCode];
 }
 
-function hardenedChildPrvKeyDerivation(parentPrvKeyWithIndex, chainCode) {
+
+function hardenedChildPrvKeyDerivation(parentPrvKey, chainCode, index=0) {
   // console.log('hardened child prv key======================');
+  const NORMAL_CHILD_BOUNDARY = (2 ** 32) / 2;
+  const parentPrvKeyWithIndex = `00${parentPrvKey}${(NORMAL_CHILD_BOUNDARY + index).toString(16)}`;
   const ORDER_OF_CURVE = BigInt('115792089237316195423570985008687907852837564279074904382605163141518161494337');
   const hash = hmac(Buffer.from(parentPrvKeyWithIndex, 'hex'), Buffer.from(chainCode, 'hex'));
-  const childPrvKey = (BigInt(`0x${parentPrvKeyWithIndex}`) + BigInt(`0x${hash.slice(0, 64)}`)) % ORDER_OF_CURVE;
+  const childPrvKey = (BigInt(`0x${parentPrvKey}`) + BigInt(`0x${hash.slice(0, 64)}`)) % ORDER_OF_CURVE;
 
   const childChainCode = hash.slice(64);
-
   return [childPrvKey.toString(16), childChainCode];
 }
 
-function generateChildKey(prvKey, pubKey, chainCode, index) {
-  const NORMAL_CHILD_BOUNDARY = (2 ** 32) / 2;
+function generateChildKey(prvKey, pubKey, chainCode, index, isHardenedChild) {
   let prvKey_;
   let pubKey_;
   let chainCode_;
-  const pubKeyWithIndex = pubKey + String(index).padStart(8, '0');
-  const prvKeyWithIndex = prvKey + String(index).padStart(8, '0');
 
-  if (index < NORMAL_CHILD_BOUNDARY) {
-    [prvKey_, chainCode_] = normalChildPrvKeyDerivation(pubKeyWithIndex, chainCode, prvKey);
-    [pubKey_] = normalChildPubKeyDerivation(pubKeyWithIndex, chainCode, pubKey);
-  } else {
-    [prvKey_, chainCode_] = hardenedChildPrvKeyDerivation(prvKeyWithIndex, chainCode);
+  if (isHardenedChild) {
+    [prvKey_, chainCode_] = hardenedChildPrvKeyDerivation(prvKey, chainCode, index);
     pubKey_ = Buffer.from(secp256k1.publicKeyCreate(Buffer.from(prvKey_, 'hex'))).toString('hex');
-    console.log('pubKey_: ', pubKey_);
+  } else {
+    [prvKey_, chainCode_] = normalChildPrvKeyDerivation(prvKey,pubKey, chainCode,  index);
+    [pubKey_] = normalChildPubKeyDerivation(pubKey, chainCode, index);
   }
 
   return [prvKey_, pubKey_, chainCode_];
@@ -234,15 +233,15 @@ function deriveExtendedKeyFromPath(parentPrvKey, parentPubKey, parentChainCode, 
     currentPath += `/${i}`;
 
     console.log(`********** derivation path: ${currentPath} **********`, );
-    let index = i.includes('`') ? parseInt(i)+ NORMAL_CHILD_BOUNDARY : parseInt(i);
-    [prvKey, pubKey, chainCode] = deriveNthChildKey(prvKey, pubKey, chainCode, index);
+    let index = parseInt(i);
+    let isHardenedChild = i.includes('`');
+    [prvKey, pubKey, chainCode] = deriveNthChildKey(prvKey, pubKey, chainCode, index, isHardenedChild);
   });
 }
 
-function deriveNthChildKey(parentPrvKey, parentPubKey, parentChainCode,index) {
-  console.log('index: ', index);
+function deriveNthChildKey(parentPrvKey, parentPubKey, parentChainCode,index, isHardenedChild) {
   const figerprint = createFigerprint(Buffer.from(parentPubKey, 'hex'));
-  let [prvKey, pubKey, chainCode] = generateChildKey(parentPrvKey, parentPubKey, parentChainCode, index);
+  let [prvKey, pubKey, chainCode] = generateChildKey(parentPrvKey, parentPubKey, parentChainCode, index, isHardenedChild);
   console.log(`==========original key of ${index} ==========`);
   console.log('pubKey: ', pubKey);
   console.log('prvKey: ', prvKey);
