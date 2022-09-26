@@ -3,7 +3,10 @@ import util from 'node:util';
 import { readFile } from 'node:fs/promises';
 import secp256k1 from 'secp256k1';
 import elliptic from 'elliptic';
+import keccak256 from 'keccak256';
 
+const EC = elliptic.ec;
+const ec = new EC('secp256k1');
 const NORMAL_CHILD_BOUNDARY = (2 ** 32) / 2;
 
 function generateEntroph(byteLength = 16) {
@@ -142,8 +145,6 @@ function normalChildPrvKeyDerivation(parentPrvKey, parentPubKey, chainCode, inde
 function normalChildPubKeyDerivation(parentPubKey, chainCode, index = 0) {
   // js Number.MAX_SAFE_INTEGER is 2 ** 53 -1 = 9007199254740991 
   // console.log('normal child pub key======================');
-  const EC = elliptic.ec;
-  const ec = new EC('secp256k1');
   const parentPubKeyWithIndex = `${parentPubKey}${index.toString(16).padStart(8, '0')}`;
   const hash = hmac(Buffer.from(parentPubKeyWithIndex, 'hex'), Buffer.from(chainCode, 'hex'));
   const Il = hash.slice(0, 64);
@@ -212,7 +213,7 @@ function serializeKey(version, depth, parentFingerprint, childNumber, chainCode,
     xpub: '0488b21e',
   };
   const padding = version === 'xprv' ? '00' : '';
-  const aggregasion = `${versionMap[version]}${String(depth).padStart(2, '0')}${parentFingerprint}${String(childNumber).padStart(8, '0')}${chainCode}${padding}${key}`;
+  const aggregasion = `${versionMap[version]}${String(depth).padStart(2, '0')}${parentFingerprint}${childNumber.padStart(8, '0')}${chainCode}${padding}${key}`;
   const checksum = getChecksum2(Buffer.from(aggregasion, 'hex'));
   const result = aggregasion + checksum.toString('hex');
   console.log('result: ', result);
@@ -244,6 +245,9 @@ function deriveNthChildKey(parentPrvKey, parentPubKey, parentChainCode, index, d
   let [prvKey, pubKey, chainCode] = generateChildKey(parentPrvKey, parentPubKey, parentChainCode, index, isHardenedChild);
   console.log(`==========original key of ${isHardenedChild ? 'hardened child ' : 'normal child'} ${index} ==========`);
   console.log('pubKey: ', pubKey);
+  const key = ec.keyFromPublic(Buffer.from(pubKey, 'hex'));
+  const uncompressedKey = key.getPublic().encode('hex');
+  console.log('account: ', keccak256(Buffer.from(uncompressedKey.slice(2), 'hex')).toString('hex').slice(-40));
   console.log('prvKey: ', prvKey);
   // [prvKey, pubKey, chainCode] = generateChildKey(
   //   "f79bb0d317b310b261a55a8ab393b4c8a1aba6fa4d08aef379caba502d5d67f9",
@@ -252,13 +256,13 @@ function deriveNthChildKey(parentPrvKey, parentPubKey, parentChainCode, index, d
   //   index
   //   );
 
-  const childNumber = isHardenedChild ? index + NORMAL_CHILD_BOUNDARY : index;
-  const figerprint = createFigerprint(Buffer.from(parentPubKey, 'hex'));
-  const serializedPrvKey = serializeKey('xprv', depth, figerprint.toString('hex'), childNumber, chainCode, prvKey);
-  const serializedPubKey = serializeKey('xpub', depth, figerprint.toString('hex'), childNumber, chainCode, pubKey);
-  console.log('==========original key==========');
-  console.log('serializedPrvKey: ', serializedPrvKey);
-  console.log('serializedPubKey: ', serializedPubKey);
+  // const childNumber = isHardenedChild ? index + NORMAL_CHILD_BOUNDARY : index;
+  // const figerprint = createFigerprint(Buffer.from(parentPubKey, 'hex'));
+  // const serializedPrvKey = serializeKey('xprv', depth, figerprint.toString('hex'), childNumber.toString(16), chainCode, prvKey);
+  // const serializedPubKey = serializeKey('xpub', depth, figerprint.toString('hex'), childNumber.toString(16), chainCode, pubKey);
+  // console.log('==========original key serialized==========');
+  // console.log('serializedPrvKey: ', serializedPrvKey);
+  // console.log('serializedPubKey: ', serializedPubKey);
   return [prvKey, pubKey, chainCode];
 }
 
@@ -270,7 +274,7 @@ async function main() {
   let [prvKey, pubKey, chainCode] = generateMasterkey(seed);
   const rootKey = serializeKey('xprv', '00', '00000000', '00000000', chainCode, prvKey);
   console.log('rootKey: ', rootKey);
-  deriveExtendedKeyFromPath(prvKey, pubKey, chainCode, 'm/44`/60`/0`/0');
+  deriveExtendedKeyFromPath(prvKey, pubKey, chainCode, 'm/44`/60`/0`/0/0');
 }
 
 main();
