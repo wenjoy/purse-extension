@@ -2,7 +2,7 @@ interface Props {
   name: string
 }
 
-const Navbar: React.FC<Props> = ({ name }) => {
+const Navbar = ({ name }: Props) => {
   return <span className='font-bold underline hover:text-gray-500'>{name}</span>;
 };
 

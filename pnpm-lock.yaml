@@ -13,8 +13,12 @@ specifiers:
   crypto: ^1.0.1
   elliptic: ^6.5.4
   eslint: ^8.23.1
+  eslint-plugin-autofix: ^1.1.0
   eslint-plugin-react: ^7.31.8
+  eslint-plugin-sort-imports-es6-autofix: ^0.6.0
+  eslint-plugin-unused-imports: ^2.0.0
   events: ^3.3.0
+  husky: ^8.0.1
   keccak256: ^1.0.6
   path: ^0.12.7
   postcss: ^8.4.16
@@ -52,7 +56,11 @@ devDependencies:
   browserify-zlib: 0.2.0
   classnames: 2.3.1
   eslint: 8.23.1
+  eslint-plugin-autofix: 1.1.0_eslint@8.23.1
   eslint-plugin-react: 7.31.8_eslint@8.23.1
+  eslint-plugin-sort-imports-es6-autofix: 0.6.0_eslint@8.23.1
+  eslint-plugin-unused-imports: 2.0.0_of2nnyqymyuameo6fhejva33re
+  husky: 8.0.1
   postcss: 8.4.16
   stream-browserify: 3.0.0
   tailwindcss: 3.1.8_postcss@8.4.16
@@ -1982,6 +1990,20 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
+  /eslint-plugin-autofix/1.1.0_eslint@8.23.1:
+    resolution: {integrity: sha512-aKQ7s6CTeJRJgnhSlsGI7kQhnNCa1q3UYBM+9PTEgvdC5b+GjV/SZA233VNqkoBldb7/BkeWBRjorUjxeUfrxA==}
+    engines: {node: '>=8'}
+    peerDependencies:
+      eslint: '>= 5.12.1'
+    dependencies:
+      eslint: 8.23.1
+      eslint-rule-composer: 0.3.0
+      espree: 9.4.0
+      esutils: 2.0.3
+      lodash: 4.17.21
+      string-similarity: 4.0.4
+    dev: true
+
   /eslint-plugin-react/7.31.8_eslint@8.23.1:
     resolution: {integrity: sha512-5lBTZmgQmARLLSYiwI71tiGVTLUuqXantZM6vlSY39OaDSV0M7+32K5DnLkmFrwTe+Ksz0ffuLUC91RUviVZfw==}
     engines: {node: '>=4'}
@@ -2003,6 +2025,34 @@ packages:
       resolve: 2.0.0-next.4
       semver: 6.3.0
       string.prototype.matchall: 4.0.7
+    dev: true
+
+  /eslint-plugin-sort-imports-es6-autofix/0.6.0_eslint@8.23.1:
+    resolution: {integrity: sha512-2NVaBGF9NN+727Fyq+jJYihdIeegjXeUUrZED9Q8FVB8MsV3YQEyXG96GVnXqWt0pmn7xfCZOZf3uKnIhBrfeQ==}
+    peerDependencies:
+      eslint: '>=7.7.0'
+    dependencies:
+      eslint: 8.23.1
+    dev: true
+
+  /eslint-plugin-unused-imports/2.0.0_of2nnyqymyuameo6fhejva33re:
+    resolution: {integrity: sha512-3APeS/tQlTrFa167ThtP0Zm0vctjr4M44HMpeg1P4bK6wItarumq0Ma82xorMKdFsWpphQBlRPzw/pxiVELX1A==}
+    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    peerDependencies:
+      '@typescript-eslint/eslint-plugin': ^5.0.0
+      eslint: ^8.0.0
+    peerDependenciesMeta:
+      '@typescript-eslint/eslint-plugin':
+        optional: true
+    dependencies:
+      '@typescript-eslint/eslint-plugin': 5.38.0_aarjygsz6gts43wtwsljfcbzn4
+      eslint: 8.23.1
+      eslint-rule-composer: 0.3.0
+    dev: true
+
+  /eslint-rule-composer/0.3.0:
+    resolution: {integrity: sha512-bt+Sh8CtDmn2OajxvNO+BX7Wn4CIWMpTRm3MaiKPCQcnnlm0CS2mhui6QaoeQugs+3Kj2ESKEEGJUdVafwhiCg==}
+    engines: {node: '>=4.0.0'}
     dev: true
 
   /eslint-scope/5.1.1:
@@ -2695,6 +2745,12 @@ packages:
       resolve-alpn: 1.2.1
     dev: false
 
+  /husky/8.0.1:
+    resolution: {integrity: sha512-xs7/chUH/CKdOCs7Zy0Aev9e/dKOMZf3K1Az1nar3tzlv0jfqnYtu235bstsWTmXOR0EfINrPa97yy4Lz6RiKw==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dev: true
+
   /iconv-lite/0.4.24:
     resolution: {integrity: sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==}
     engines: {node: '>=0.10.0'}
@@ -3047,6 +3103,10 @@ packages:
 
   /lodash.merge/4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
+    dev: true
+
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
     dev: true
 
   /loose-envify/1.4.0:
@@ -4092,6 +4152,10 @@ packages:
     resolution: {integrity: sha512-R3f198pcvnB+5IpnBlRkphuE9n46WyVl8I39W/ZUTZLz4nqSP/oLYUrcnJrw462Ds8he4YKMov2efsTIw1BDGQ==}
     engines: {node: '>=0.10.0'}
     dev: false
+
+  /string-similarity/4.0.4:
+    resolution: {integrity: sha512-/q/8Q4Bl4ZKAPjj8WerIBJWALKkaPRfrvhfF8k/B23i4nzrlRj2/go1m90In7nG/3XDSbOo0+pu6RvCTM9RGMQ==}
+    dev: true
 
   /string.prototype.matchall/4.0.7:
     resolution: {integrity: sha512-f48okCX7JiwVi1NXCVWcFnZgADDC/n2vePlQ/KUCNqCikLLilQvwjMO8+BHVKvgzH0JB0J9LEPgxOGT02RoETg==}

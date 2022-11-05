@@ -15,7 +15,13 @@ parserOptions:
 plugins:
   - react
   - '@typescript-eslint'
+  - autofix
+  - sort-imports-es6-autofix
 rules: 
   semi: 
     - error
     - always
+  '@typescript-eslint/no-unused-vars': error
+  autofix/no-unused-vars: error
+  autofix/no-console: error
+  sort-imports-es6-autofix/sort-imports-es6: error

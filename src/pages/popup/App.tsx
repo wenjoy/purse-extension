@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import Dropdown from '../../components/dropdown';
-import Navbar from '../../components/navbar';
 import Copy from '../../components/copy';
 import Drawer from '../../components/drawer';
-import useWeb3 from '../../hooks/useWeb3';
+import Dropdown from '../../components/dropdown';
+import Navbar from '../../components/navbar';
 import truncate from '../../utils/truncate';
+import useWeb3 from '../../hooks/useWeb3';
 
 interface Account {
   name: string,
