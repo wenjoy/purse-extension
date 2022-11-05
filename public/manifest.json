@@ -3,7 +3,7 @@
   "name": "purse",
   "version": "0.0.1",
   "author": "wenjoy",
-  "description": "A excelent crypto wallet",
+  "description": "An excelent crypto wallet",
   "action": {
     "default_popup": "popup.html"
   },
