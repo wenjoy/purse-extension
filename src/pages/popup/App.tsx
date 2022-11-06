@@ -1,23 +1,23 @@
-import { useState } from 'react';
-import Copy from '../../components/copy';
-import Drawer from '../../components/drawer';
-import Dropdown from '../../components/dropdown';
-import Navbar from '../../components/navbar';
-import truncate from '../../utils/truncate';
-import useWeb3 from '../../hooks/useWeb3';
+import { useState } from "react";
+import Copy from "../../components/copy";
+import Drawer from "../../components/drawer";
+import Dropdown from "../../components/dropdown";
+import Navbar from "../../components/navbar";
+import truncate from "../../utils/truncate";
+import useWeb3 from "../../hooks/useWeb3";
 
 interface Account {
-  name: string,
-  address: string
+  name: string;
+  address: string;
 }
 
 interface Network {
-  name: string,
-  rpcUrl: string,
-  chainId: number,
-  symbol: string,
-  explorer?: string,
-  icon: string
+  name: string;
+  rpcUrl: string;
+  chainId: number;
+  symbol: string;
+  explorer?: string;
+  icon: string;
 }
 
 function App() {
@@ -27,45 +27,58 @@ function App() {
 
   // TODO: jump to create wallet
   accounts.push({
-    name: 'Account1',
-    address: '0x100000101'
+    name: "Account1",
+    address: "0x100000101",
   });
   const wallet = web3.eth.accounts.wallet;
-  
+
   for (let i = 0; i < wallet.length; i++) {
     const element = wallet[i];
     accounts.push({
-      name: `Wallet ${i+1}`,
-      address: truncate(element.address)
+      name: `Wallet ${i + 1}`,
+      address: truncate(element.address),
     });
   }
 
   const [selected, setSelected] = useState(accounts[0].address);
 
-  const balance = 100;
+  let balance = 100;
+  if (
+    balance > 10 &&
+    selected === "test code" &&
+    accounts.length > 10 &&
+    networks.length > 100
+  ) {
+    balance++;
+  }
 
   networks.push({
-    name: 'ethereum',
-    rpcUrl: 'http://abc',
+    name: "ethereum",
+    rpcUrl: "http://abc",
     chainId: 1,
-    symbol: 'ETH',
-    icon: 'E'
+    symbol: "ETH",
+    icon: "E",
   });
 
   const { name: netwokName, icon, symbol } = networks[0];
   const navbar = [
-    {id: '1', name: 'Token' },
-    {id: '2', name: 'Assets' },
-    {id: '3', name: 'Transaction' },
-    {id: '4', name: 'Setting' },
+    { id: "1", name: "Token" },
+    { id: "2", name: "Assets" },
+    { id: "3", name: "Transaction" },
+    { id: "4", name: "Setting" },
   ];
-  const currentAccount = accounts.find(({address}) => address === selected);
-  const [visible, setVisible ]= useState(false);
+  const currentAccount = accounts.find(({ address }) => address === selected);
+  const [visible, setVisible] = useState(false);
 
   const copyHandler = () => {
-    navigator.clipboard.writeText(String(currentAccount!.address)).then(() => {alert('Copied');}).catch(() => {
-      alert('Copy failed');
-    });
+    navigator.clipboard
+      .writeText(String(currentAccount!.address))
+      .then(() => {
+        alert("Copied");
+      })
+      .catch(() => {
+        alert("Copy failed");
+      });
   };
   const showDrawer = () => {
     setVisible(true);
@@ -84,16 +97,26 @@ function App() {
     setSelected(id);
   };
 
-  const options = accounts.map(({name, address})=>({label: name, value: address}));
+  const options = accounts.map(({ name, address }) => ({
+    label: name,
+    value: address,
+  }));
 
   return (
-  <div className="container h-[600px] w-[400px] py-2.5 flex flex-col">
+    <div className="container h-[600px] w-[400px] py-2.5 flex flex-col">
       <section className="w-full shadow-md py-2.5 flex justify-around items-center">
-        <span className='flex items-center justify-between'>
-          <Dropdown selected={selected} data={options} onAdd={showDrawer} onSelect={selectHandler} />
+        <span className="flex items-center justify-between">
+          <Dropdown
+            selected={selected}
+            data={options}
+            onAdd={showDrawer}
+            onSelect={selectHandler}
+          />
           <Copy onClick={copyHandler} />
         </span>
-        <span>{icon} {netwokName}</span>
+        <span>
+          {icon} {netwokName}
+        </span>
       </section>
       <section className="container flex-1 flex items-center justify-center">
         <span>
@@ -101,11 +124,17 @@ function App() {
         </span>
       </section>
       <section className="w-full flex justify-around">
-        {navbar.map(({ name, id }) => <span key={id}><Navbar name={name} /></span> )}
+        {navbar.map(({ name, id }) => (
+          <span key={id}>
+            <Navbar name={name} />
+          </span>
+        ))}
       </section>
       <Drawer visible={visible} onClose={hideDrawer}>
-        <button className='btn' onClick={creatAccont}>Create a new account</button>
-        <button className='btn'>Import from private key</button>
+        <button className="btn" onClick={creatAccont}>
+          Create a new account
+        </button>
+        <button className="btn">Import from private key</button>
       </Drawer>
     </div>
   );
