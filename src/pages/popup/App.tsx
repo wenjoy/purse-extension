@@ -1,10 +1,10 @@
+import { entropyToMnemonic } from "@ethersproject/hdnode";
+import { ethers } from "ethers";
 import { useState } from "react";
 import Copy from "../../components/copy";
 import Drawer from "../../components/drawer";
 import Dropdown from "../../components/dropdown";
 import Navbar from "../../components/navbar";
-import truncate from "../../utils/truncate";
-import useWeb3 from "../../hooks/useWeb3";
 
 interface Account {
   name: string;
@@ -23,22 +23,33 @@ interface Network {
 function App() {
   const accounts: Account[] = [];
   const networks: Network[] = [];
-  const web3 = useWeb3();
 
   // TODO: jump to create wallet
   accounts.push({
     name: "Account1",
     address: "0x100000101",
   });
-  const wallet = web3.eth.accounts.wallet;
 
-  for (let i = 0; i < wallet.length; i++) {
-    const element = wallet[i];
-    accounts.push({
-      name: `Wallet ${i + 1}`,
-      address: truncate(element.address),
-    });
-  }
+  const generateWallet = () => {
+    const {
+      utils: { randomBytes },
+      Wallet: { fromMnemonic },
+    } = ethers;
+    const entropy = randomBytes(16);
+    const mnemonic = entropyToMnemonic(entropy);
+    const wallet = fromMnemonic(mnemonic);
+    return wallet;
+  };
+  const wallet = generateWallet();
+  console.log("debug", wallet);
+
+  // for (let i = 0; i < wallet.length; i++) {
+  //   const element = wallet[i];
+  //   accounts.push({
+  //     name: `Wallet ${i + 1}`,
+  //     address: truncate(element.address),
+  //   });
+  // }
 
   const [selected, setSelected] = useState(accounts[0].address);
 
@@ -89,7 +100,6 @@ function App() {
   };
 
   const creatAccont = () => {
-    web3.eth.accounts.wallet.create(1);
     hideDrawer();
   };
 

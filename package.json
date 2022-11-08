@@ -12,20 +12,24 @@
     "format": "prettier --write src/"
   },
   "lint-staged": {
-    "*.{tsx,ts}": ["prettier --write", "eslint --fix"]
+    "*.{tsx,ts}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   },
   "dependencies": {
+    "@ethersproject/hdnode": "^5.7.0",
     "buffer": "^6.0.3",
     "crypto": "^1.0.1",
     "elliptic": "^6.5.4",
+    "ethers": "^5.7.2",
     "events": "^3.3.0",
     "keccak256": "^1.0.6",
     "path": "^0.12.7",
     "process": "^0.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "secp256k1": "^4.0.3",
-    "web3": "^1.7.5"
+    "secp256k1": "^4.0.3"
   },
   "devDependencies": {
     "@types/react": "^18.0.17",
