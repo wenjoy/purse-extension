@@ -8,4 +8,5 @@
 //   return BlockchainTool.current;
 // };
 
-// export default useBlockchainTool;
+const useBlockchainTool = {};
+export default useBlockchainTool;

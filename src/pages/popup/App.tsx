@@ -20,6 +20,34 @@ interface Network {
   icon: string;
 }
 
+const generateMnemonic = () => {
+  const {
+    utils: { randomBytes },
+  } = ethers;
+  const entropy = randomBytes(16);
+  const mnemonic = entropyToMnemonic(entropy);
+  return mnemonic;
+};
+
+// const generateWallet = (mnemonic: string) => {
+//   const {
+//     Wallet: { fromMnemonic },
+//   } = ethers;
+//   const wallet = fromMnemonic(mnemonic);
+//   return wallet;
+// };
+
+const getMnemonic = () => {
+  const mnemonic = localStorage.getItem("mnemonic");
+  if (mnemonic) {
+    return mnemonic;
+  } else {
+    const newMnemonic = generateMnemonic();
+    localStorage.setItem("mnemonic", newMnemonic);
+    return newMnemonic;
+  }
+};
+
 function App() {
   const accounts: Account[] = [];
   const networks: Network[] = [];
@@ -30,18 +58,8 @@ function App() {
     address: "0x100000101",
   });
 
-  const generateWallet = () => {
-    const {
-      utils: { randomBytes },
-      Wallet: { fromMnemonic },
-    } = ethers;
-    const entropy = randomBytes(16);
-    const mnemonic = entropyToMnemonic(entropy);
-    const wallet = fromMnemonic(mnemonic);
-    return wallet;
-  };
-  const wallet = generateWallet();
-  console.log("debug", wallet);
+  const mnemonic = getMnemonic();
+  console.log("debug", mnemonic);
 
   // for (let i = 0; i < wallet.length; i++) {
   //   const element = wallet[i];
@@ -128,6 +146,7 @@ function App() {
           {icon} {netwokName}
         </span>
       </section>
+
       <section className="container flex-1 flex items-center justify-center">
         <span>
           {balance} {symbol}
@@ -140,6 +159,7 @@ function App() {
           </span>
         ))}
       </section>
+
       <Drawer visible={visible} onClose={hideDrawer}>
         <button className="btn" onClick={creatAccont}>
           Create a new account
