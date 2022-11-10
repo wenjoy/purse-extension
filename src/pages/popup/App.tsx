@@ -1,14 +1,15 @@
+import { Wallet, ethers } from "ethers";
 import { entropyToMnemonic } from "@ethersproject/hdnode";
-import { ethers } from "ethers";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Copy from "../../components/copy";
 import Drawer from "../../components/drawer";
 import Dropdown from "../../components/dropdown";
 import Navbar from "../../components/navbar";
+import truncate from "../../utils/truncate";
 
 interface Account {
   name: string;
-  address: string;
+  wallet: Wallet;
 }
 
 interface Network {
@@ -29,47 +30,34 @@ const generateMnemonic = () => {
   return mnemonic;
 };
 
-// const generateWallet = (mnemonic: string) => {
-//   const {
-//     Wallet: { fromMnemonic },
-//   } = ethers;
-//   const wallet = fromMnemonic(mnemonic);
-//   return wallet;
-// };
+const generateWallet = (mnemonic: string, path?: string) => {
+  const {
+    Wallet: { fromMnemonic },
+  } = ethers;
+  const wallet = fromMnemonic(mnemonic, path);
+  return wallet;
+};
 
 const getMnemonic = () => {
   const mnemonic = localStorage.getItem("mnemonic");
+  console.log("mnemonic local", mnemonic);
   if (mnemonic) {
     return mnemonic;
   } else {
     const newMnemonic = generateMnemonic();
     localStorage.setItem("mnemonic", newMnemonic);
+    console.log("mnemonic new", mnemonic);
     return newMnemonic;
   }
 };
 
 function App() {
-  const accounts: Account[] = [];
+  const [selected, setSelected] = useState("");
+  const counter = useRef(0);
+  const accountsRef = useRef<Account[]>([]);
+
   const networks: Network[] = [];
-
-  // TODO: jump to create wallet
-  accounts.push({
-    name: "Account1",
-    address: "0x100000101",
-  });
-
-  const mnemonic = getMnemonic();
-  console.log("debug", mnemonic);
-
-  // for (let i = 0; i < wallet.length; i++) {
-  //   const element = wallet[i];
-  //   accounts.push({
-  //     name: `Wallet ${i + 1}`,
-  //     address: truncate(element.address),
-  //   });
-  // }
-
-  const [selected, setSelected] = useState(accounts[0].address);
+  const accounts = accountsRef.current;
 
   let balance = 100;
   if (
@@ -96,12 +84,16 @@ function App() {
     { id: "3", name: "Transaction" },
     { id: "4", name: "Setting" },
   ];
-  const currentAccount = accounts.find(({ address }) => address === selected);
+  const currentAccount = accounts.find(
+    ({ wallet: { address } }) => address === selected
+  );
+  console.log("lll", currentAccount, accounts, selected);
+
   const [visible, setVisible] = useState(false);
 
   const copyHandler = () => {
     navigator.clipboard
-      .writeText(String(currentAccount!.address))
+      .writeText(String(currentAccount?.wallet.address))
       .then(() => {
         alert("Copied");
       })
@@ -118,6 +110,11 @@ function App() {
   };
 
   const creatAccont = () => {
+    const mnemonic = getMnemonic();
+    const path = `m/44'/60'/0'/0/${counter.current++}`;
+    const wallet = generateWallet(mnemonic, path);
+    accounts.push({ name: `Account ${counter.current + 1}`, wallet });
+
     hideDrawer();
   };
 
@@ -125,8 +122,8 @@ function App() {
     setSelected(id);
   };
 
-  const options = accounts.map(({ name, address }) => ({
-    label: name,
+  const options = accounts.map(({ name, wallet: { address } }) => ({
+    label: `${name} ${truncate(address)}`,
     value: address,
   }));
 
