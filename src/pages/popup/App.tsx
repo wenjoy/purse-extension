@@ -1,10 +1,11 @@
 import { Wallet, ethers } from "ethers";
 import { entropyToMnemonic } from "@ethersproject/hdnode";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Copy from "../../components/copy";
 import Drawer from "../../components/drawer";
 import Dropdown from "../../components/dropdown";
 import Navbar from "../../components/navbar";
+import persist from "../../service/persist";
 import truncate from "../../utils/truncate";
 
 interface Account {
@@ -38,26 +39,37 @@ const generateWallet = (mnemonic: string, path?: string) => {
   return wallet;
 };
 
-const getMnemonic = () => {
-  const mnemonic = localStorage.getItem("mnemonic");
-  console.log("mnemonic local", mnemonic);
+const getMnemonic = async () => {
+  const { mnemonic } = await persist.get("mnemonic");
   if (mnemonic) {
     return mnemonic;
   } else {
     const newMnemonic = generateMnemonic();
-    localStorage.setItem("mnemonic", newMnemonic);
-    console.log("mnemonic new", mnemonic);
+    await persist.set("mnemonic", newMnemonic);
     return newMnemonic;
   }
 };
 
 function App() {
   const [selected, setSelected] = useState("");
-  const counter = useRef(0);
-  const accountsRef = useRef<Account[]>([]);
+  const counterRef = useRef(0);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+
+  useEffect(() => {
+    const getAccounts = async () => {
+      const { accounts } = await persist.get("accounts");
+      const { counter } = await persist.get("counter");
+      if (accounts) {
+        setAccounts(accounts);
+      }
+      if (counter > 0) {
+        counterRef.current = counter;
+      }
+    };
+    getAccounts();
+  }, []);
 
   const networks: Network[] = [];
-  const accounts = accountsRef.current;
 
   let balance = 100;
   if (
@@ -109,11 +121,14 @@ function App() {
     setVisible(false);
   };
 
-  const creatAccont = () => {
-    const mnemonic = getMnemonic();
-    const path = `m/44'/60'/0'/0/${counter.current++}`;
-    const wallet = generateWallet(mnemonic, path);
-    accounts.push({ name: `Account ${counter.current + 1}`, wallet });
+  const creatAccont = async () => {
+    const mnemonic = await getMnemonic();
+    const path = `m/44'/60'/0'/0/${counterRef.current++}`;
+    const wallet = generateWallet(mnemonic as string, path);
+    accounts.push({ name: `Account ${counterRef.current}`, wallet });
+
+    await persist.set("accounts", accounts);
+    await persist.set("counter", counterRef.current);
 
     hideDrawer();
   };
