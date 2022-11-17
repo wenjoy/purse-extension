@@ -1,4 +1,4 @@
-import { Wallet, ethers } from "ethers";
+import { Wallet, ethers, utils } from "ethers";
 import { entropyToMnemonic } from "@ethersproject/hdnode";
 import { useEffect, useRef, useState } from "react";
 import Copy from "../../components/copy";
@@ -50,10 +50,21 @@ const getMnemonic = async () => {
   }
 };
 
+const isValidAddress = (address: string) => {
+  if (address.length > 0) {
+    return true;
+  } else {
+    console.log("logger: invalid address %s", address);
+    return false;
+  }
+};
+console.log("logger: ethers ", ethers);
+
 function App() {
   const [selected, setSelected] = useState("");
-  const counterRef = useRef(0);
+  const [balance, setBalance] = useState("0");
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const counterRef = useRef(0);
 
   useEffect(() => {
     const getAccounts = async () => {
@@ -61,6 +72,7 @@ function App() {
       const { counter } = await persist.get("counter");
       if (accounts) {
         setAccounts(accounts);
+        setSelected(accounts[0].wallet.address);
       }
       if (counter > 0) {
         counterRef.current = counter;
@@ -69,17 +81,25 @@ function App() {
     getAccounts();
   }, []);
 
-  const networks: Network[] = [];
+  const currentAccount = accounts.find(
+    ({ wallet: { address } }) => address === selected
+  );
 
-  let balance = 100;
-  if (
-    balance > 10 &&
-    selected === "test code" &&
-    accounts.length > 10 &&
-    networks.length > 100
-  ) {
-    balance++;
-  }
+  // const provider = new ethers.providers.JsonRpcProvider();
+  const provider = ethers.getDefaultProvider("goerli", {
+    alchemy: "v52XdAeZ58ftv3xmWNbqao3k5F1Y_E3V",
+  });
+
+  const play = async () => {
+    if (isValidAddress(selected)) {
+      const balance = await provider.getBalance(selected);
+      setBalance(utils.formatEther(balance));
+    }
+  };
+
+  play();
+
+  const networks: Network[] = [];
 
   networks.push({
     name: "ethereum",
@@ -96,10 +116,6 @@ function App() {
     { id: "3", name: "Transaction" },
     { id: "4", name: "Setting" },
   ];
-  const currentAccount = accounts.find(
-    ({ wallet: { address } }) => address === selected
-  );
-  console.log("lll", currentAccount, accounts, selected);
 
   const [visible, setVisible] = useState(false);
 
@@ -133,8 +149,8 @@ function App() {
     hideDrawer();
   };
 
-  const selectHandler = (id: string) => {
-    setSelected(id);
+  const selectHandler = (address: string) => {
+    setSelected(address);
   };
 
   const options = accounts.map(({ name, wallet: { address } }) => ({
