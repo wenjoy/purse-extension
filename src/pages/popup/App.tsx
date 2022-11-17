@@ -15,11 +15,11 @@ interface Account {
 
 interface Network {
   name: string;
-  rpcUrl: string;
-  chainId: number;
-  symbol: string;
+  rpcUrl?: string;
+  chainId?: number;
+  symbol?: string;
   explorer?: string;
-  icon: string;
+  icon?: string;
 }
 
 const generateMnemonic = () => {
@@ -60,11 +60,34 @@ const isValidAddress = (address: string) => {
 };
 console.log("logger: ethers ", ethers);
 
+const getNetworks = () => {
+  const networks = [
+    { name: "homestead" },
+    { name: "goerli" },
+    { name: "matic" },
+    { name: "arbitrum" },
+    { name: "optimism" },
+  ];
+  return networks;
+};
+
 function App() {
   const [selected, setSelected] = useState("");
   const [balance, setBalance] = useState("0");
   const [accounts, setAccounts] = useState<Account[]>([]);
   const counterRef = useRef(0);
+  const [selectedNetwork, setSelectedNetwork] = useState("");
+
+  const networks: Network[] = getNetworks();
+
+  const networksOptions = networks.map(({ name }) => ({
+    label: name,
+    value: name,
+  }));
+  const accountsOptions = accounts.map(({ name, wallet: { address } }) => ({
+    label: `${name} ${truncate(address)}`,
+    value: address,
+  }));
 
   useEffect(() => {
     const getAccounts = async () => {
@@ -81,16 +104,20 @@ function App() {
     getAccounts();
   }, []);
 
+  useEffect(() => {
+    setSelectedNetwork(networks[0].name);
+  }, []);
+
   const currentAccount = accounts.find(
     ({ wallet: { address } }) => address === selected
   );
 
   // const provider = new ethers.providers.JsonRpcProvider();
-  const provider = ethers.getDefaultProvider("goerli", {
-    alchemy: "v52XdAeZ58ftv3xmWNbqao3k5F1Y_E3V",
-  });
 
   const play = async () => {
+    const provider = ethers.getDefaultProvider(selectedNetwork, {
+      alchemy: "v52XdAeZ58ftv3xmWNbqao3k5F1Y_E3V",
+    });
     if (isValidAddress(selected)) {
       const balance = await provider.getBalance(selected);
       setBalance(utils.formatEther(balance));
@@ -99,17 +126,6 @@ function App() {
 
   play();
 
-  const networks: Network[] = [];
-
-  networks.push({
-    name: "ethereum",
-    rpcUrl: "http://abc",
-    chainId: 1,
-    symbol: "ETH",
-    icon: "E",
-  });
-
-  const { name: netwokName, icon, symbol } = networks[0];
   const navbar = [
     { id: "1", name: "Token" },
     { id: "2", name: "Assets" },
@@ -153,32 +169,29 @@ function App() {
     setSelected(address);
   };
 
-  const options = accounts.map(({ name, wallet: { address } }) => ({
-    label: `${name} ${truncate(address)}`,
-    value: address,
-  }));
-
   return (
     <div className="container h-[600px] w-[400px] py-2.5 flex flex-col">
       <section className="w-full shadow-md py-2.5 flex justify-around items-center">
         <span className="flex items-center justify-between">
           <Dropdown
             selected={selected}
-            data={options}
+            data={accountsOptions}
             onAdd={showDrawer}
             onSelect={selectHandler}
           />
           <Copy onClick={copyHandler} />
         </span>
         <span>
-          {icon} {netwokName}
+          <Dropdown
+            selected={selectedNetwork}
+            data={networksOptions}
+            onSelect={setSelectedNetwork}
+          />
         </span>
       </section>
 
       <section className="container flex-1 flex items-center justify-center">
-        <span>
-          {balance} {symbol}
-        </span>
+        <span>{balance}</span>
       </section>
       <section className="w-full flex justify-around">
         {navbar.map(({ name, id }) => (
