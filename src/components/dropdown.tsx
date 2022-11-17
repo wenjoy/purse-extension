@@ -81,14 +81,16 @@ const Dropdown = ({
               <span>{label}</span>
             </DropdownItem>
           ))}
-          <DropdownItem className="flex justify-center hover:bg-white">
-            <span
-              onClick={onAdd}
-              className="border rounded-lg px-1 shadow-sm text-white bg-slate-600 active:bg-slate-500 hover:bg-slate-400 select-none"
-            >
-              Add a new account
-            </span>
-          </DropdownItem>
+          {onAdd && (
+            <DropdownItem className="flex justify-center hover:bg-white">
+              <span
+                onClick={onAdd}
+                className="border rounded-lg px-1 shadow-sm text-white bg-slate-600 active:bg-slate-500 hover:bg-slate-400 select-none"
+              >
+                Add a new item
+              </span>
+            </DropdownItem>
+          )}
         </div>
       )}
     </div>
