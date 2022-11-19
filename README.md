@@ -12,6 +12,4 @@ icon jsx copy from here https://heroicons.com/
 签名transaction
 交易token
 
-{"mnemonic":"health wedding cross gallery boss occur ozone bacon toss capable matter tell"}
-
 goerli faucet https://goerlifaucet.com/
