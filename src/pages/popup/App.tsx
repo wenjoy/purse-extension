@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import Copy from "../../components/copy";
 import Drawer from "../../components/drawer";
 import Dropdown from "../../components/dropdown";
+import Loader from "../../components/loader";
 import Navbar from "../../components/navbar";
 import persist from "../../service/persist";
 import truncate from "../../utils/truncate";
+import useBalance from "../../hooks/useBalance";
 
 interface Account {
   name: string;
@@ -58,7 +60,6 @@ const isValidAddress = (address: string) => {
     return false;
   }
 };
-console.log("logger: ethers ", ethers);
 
 const getNetworks = () => {
   const networks = [
@@ -72,11 +73,12 @@ const getNetworks = () => {
 };
 
 function App() {
+  const [provider, setProvider] = useState<any>();
   const [selected, setSelected] = useState("");
-  const [balance, setBalance] = useState("0");
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const counterRef = useRef(0);
   const [selectedNetwork, setSelectedNetwork] = useState("");
+  const [visible, setVisible] = useState(false);
+  const counterRef = useRef(0);
 
   const networks: Network[] = getNetworks();
 
@@ -105,26 +107,36 @@ function App() {
   }, []);
 
   useEffect(() => {
-    setSelectedNetwork(networks[0].name);
+    // For debug with ethers API
+    console.log("logger: ethers ", ethers);
   }, []);
 
-  const currentAccount = accounts.find(
-    ({ wallet: { address } }) => address === selected
-  );
+  useEffect(() => {
+    if (selectedNetwork === "") {
+      setSelectedNetwork(networks[0].name);
+    } else {
+      const provider = ethers.getDefaultProvider(selectedNetwork, {
+        alchemy: "v52XdAeZ58ftv3xmWNbqao3k5F1Y_E3V",
+      });
+      setProvider(provider);
+    }
+  }, [selectedNetwork]);
 
   // const provider = new ethers.providers.JsonRpcProvider();
 
-  const play = async () => {
-    const provider = ethers.getDefaultProvider(selectedNetwork, {
-      alchemy: "v52XdAeZ58ftv3xmWNbqao3k5F1Y_E3V",
-    });
-    if (isValidAddress(selected)) {
-      const balance = await provider.getBalance(selected);
-      setBalance(utils.formatEther(balance));
-    }
-  };
+  const requestBalance = async (selected: Address, provider: any) => {
+    let balance = "";
 
-  play();
+    if (isValidAddress(selected) && provider) {
+      const value = await provider.getBalance(selected);
+      balance = utils.formatEther(value);
+    }
+    return balance;
+  };
+  const { balance, loading } = useBalance(
+    [selected, provider],
+    (address: Address) => requestBalance(address, provider)
+  );
 
   const navbar = [
     { id: "1", name: "Token" },
@@ -133,7 +145,9 @@ function App() {
     { id: "4", name: "Setting" },
   ];
 
-  const [visible, setVisible] = useState(false);
+  const currentAccount = accounts.find(
+    ({ wallet: { address } }) => address === selected
+  );
 
   const copyHandler = () => {
     navigator.clipboard
@@ -191,7 +205,9 @@ function App() {
       </section>
 
       <section className="container flex-1 flex items-center justify-center">
-        <span>{balance}</span>
+        <Loader loading={loading}>
+          <span>{balance} ETH</span>
+        </Loader>
       </section>
       <section className="w-full flex justify-around">
         {navbar.map(({ name, id }) => (

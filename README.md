@@ -5,7 +5,13 @@
 
 [tailwindcss](https://tailwindcss.com/docs/animation)
 
+icon jsx copy from here https://heroicons.com/
+
 # Feature
 管理key
 签名transaction
 交易token
+
+{"mnemonic":"health wedding cross gallery boss occur ozone bacon toss capable matter tell"}
+
+goerli faucet https://goerlifaucet.com/
