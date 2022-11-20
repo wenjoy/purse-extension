@@ -6,6 +6,7 @@ import Drawer from "../../components/drawer";
 import Dropdown from "../../components/dropdown";
 import Loader from "../../components/loader";
 import Navbar from "../../components/navbar";
+import logger from "../../service/logger";
 import persist from "../../service/persist";
 import truncate from "../../utils/truncate";
 import useBalance from "../../hooks/useBalance";
@@ -56,7 +57,7 @@ const isValidAddress = (address: string) => {
   if (address.length > 0) {
     return true;
   } else {
-    console.log("logger: invalid address %s", address);
+    logger.info("logger: invalid address %s", address);
     return false;
   }
 };
@@ -79,6 +80,7 @@ function App() {
   const [selectedNetwork, setSelectedNetwork] = useState("");
   const [visible, setVisible] = useState(false);
   const counterRef = useRef(0);
+  logger.info("test logger");
 
   const networks: Network[] = getNetworks();
 
