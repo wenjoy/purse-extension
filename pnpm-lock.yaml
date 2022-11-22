@@ -10,6 +10,7 @@ specifiers:
   autoprefixer: ^10.4.8
   browserify-zlib: ^0.2.0
   buffer: ^6.0.3
+  chrome-types: ^0.1.150
   classnames: ^2.3.1
   crypto: ^1.0.1
   elliptic: ^6.5.4
@@ -41,6 +42,7 @@ specifiers:
 dependencies:
   '@ethersproject/hdnode': 5.7.0
   buffer: 6.0.3
+  chrome-types: 0.1.150
   crypto: 1.0.1
   elliptic: 6.5.4
   ethers: 5.7.2
@@ -1230,6 +1232,10 @@ packages:
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
+
+  /chrome-types/0.1.150:
+    resolution: {integrity: sha512-p4PL0cnhzuW0Jkd50ax4QM8KChqedTVECfHcxWKYEBC1UZxbXUBHVpy0pMueEopZaOMuQUdnPyRfeOSdfvqAJg==}
+    dev: false
 
   /classnames/2.3.1:
     resolution: {integrity: sha512-OlQdbZ7gLfGarSqxesMesDa5uz7KFbID8Kpq/SxIoNGDqY8lSYs0D+hhtBXhcdB3rcbXArFr7vlHheLk1voeNA==}

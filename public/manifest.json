@@ -1,21 +1,42 @@
 {
-  "manifest_version": 3,
-  "name": "purse",
-  "version": "0.0.5",
-  "author": "wenjoy",
-  "description": "An excelent crypto wallet",
-  "action": {
-    "default_popup": "popup.html"
-  },
-  "contentScripts": [
-    {}
-  ],
-  "icons": {
-    "16": "icon16.png",
-    "48": "icon48.png",
-    "128": "icon128.png"
-  },
-  "permissions": [
-    "storage"
-  ]
+    "manifest_version": 3,
+    "name": "purse",
+    "version": "0.0.700",
+    "author": "wenjoy",
+    "description": "An excelent crypto wallet",
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "content_scripts": [
+        {
+            "js": [
+                "content.js"
+            ],
+            "matches": [
+                "http://*/*"
+            ]
+        }
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "inject.js"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
+    "icons": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    },
+    "permissions": [
+        "storage",
+        "activeTab"
+    ]
 }

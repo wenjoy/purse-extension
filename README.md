@@ -13,3 +13,5 @@ icon jsx copy from here https://heroicons.com/
 交易token
 
 goerli faucet https://goerlifaucet.com/
+
+refer metamask: https://docs.metamask.io/guide/ethereum-provider.html#methods

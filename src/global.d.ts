@@ -8,4 +8,6 @@ declare let chrome: {
       ) => void;
     };
   };
+  windows: any;
+  runtime: any;
 };
