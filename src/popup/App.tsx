@@ -1,15 +1,15 @@
 import { Wallet, ethers, utils } from "ethers";
 import { entropyToMnemonic } from "@ethersproject/hdnode";
 import { useEffect, useRef, useState } from "react";
-import Copy from "../../components/copy";
-import Drawer from "../../components/drawer";
-import Dropdown from "../../components/dropdown";
-import Loader from "../../components/loader";
-import Navbar from "../../components/navbar";
-import logger from "../../service/logger";
-import persist from "../../service/persist";
-import truncate from "../../utils/truncate";
-import useBalance from "../../hooks/useBalance";
+import Copy from "../components/copy";
+import Drawer from "../components/drawer";
+import Dropdown from "../components/dropdown";
+import Loader from "../components/loader";
+import Navbar from "../components/navbar";
+import logger from "../service/logger";
+import persist from "../service/persist";
+import truncate from "../utils/truncate";
+import useBalance from "../hooks/useBalance";
 
 interface Account {
   name: string;
