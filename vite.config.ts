@@ -21,6 +21,7 @@ export default defineConfig({
       // },
       input: [
         "popup.html",
+        "connect.html",
         "src/scripts/content.ts",
         "src/scripts/background.ts",
         "src/scripts/inject.ts",
