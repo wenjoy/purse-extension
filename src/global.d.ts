@@ -10,4 +10,5 @@ declare let chrome: {
   };
   windows: any;
   runtime: any;
+  tabs: any;
 };

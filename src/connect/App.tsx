@@ -13,6 +13,47 @@ function App() {
     main();
   }, []);
 
+  const cancelHandler = () => {
+    console.log("cancel");
+    chrome.tabs.query(
+      { active: true, currentWindow: false },
+      function (tabs: any) {
+        chrome.tabs.sendMessage(
+          tabs[0].id,
+          {
+            type: "FROM_POPUP",
+            payload: null,
+          },
+          function (response: any) {
+            console.log(response);
+            window.close();
+          }
+        );
+      }
+    );
+  };
+
+  const okHandler = () => {
+    console.log("Agree");
+
+    chrome.tabs.query(
+      { active: true, currentWindow: false },
+      function (tabs: any) {
+        chrome.tabs.sendMessage(
+          tabs[0].id,
+          {
+            type: "FROM_POPUP",
+            payload: account,
+          },
+          function (response: any) {
+            console.log("res: ", response);
+            window.close();
+          }
+        );
+      }
+    );
+  };
+
   const account = accounts[0];
 
   return (
@@ -27,8 +68,12 @@ function App() {
         </span>
       </section>
       <section className="space-x-5 justify-center flex mt-5">
-        <button className="btn-dark">Cancel</button>
-        <button className="btn">Agree</button>
+        <button className="btn-dark" onClick={cancelHandler}>
+          Cancel
+        </button>
+        <button className="btn" onClick={okHandler}>
+          Agree
+        </button>
       </section>
     </div>
   );
