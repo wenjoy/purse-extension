@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn {
+    @apply inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out;
+  }
+
+  .btn-dark{
+    @apply inline-block px-6 py-2.5 bg-gray-800 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-gray-900 hover:shadow-lg focus:bg-gray-900 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-gray-900 active:shadow-lg transition duration-150 ease-in-out;
+  }
+
+  .panel {
+    @apply container h-[600px] w-[400px] py-2.5 flex flex-col shadow-md p-3
+  }
+}
+
+@keyframes fade-in {
+  from {
+    @apply -bottom-20;
+  }
+
+  to {
+    @apply bottom-0;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    @apply bottom-0;
+  }
+
+  to {
+    @apply -bottom-20;
+  }
+}

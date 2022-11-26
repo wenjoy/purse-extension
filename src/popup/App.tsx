@@ -186,7 +186,7 @@ function App() {
   };
 
   return (
-    <div className="container h-[600px] w-[400px] py-2.5 flex flex-col">
+    <div className="panel">
       <section className="w-full shadow-md py-2.5 flex justify-around items-center">
         <span className="flex items-center justify-between">
           <Dropdown

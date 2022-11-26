@@ -16,17 +16,20 @@ function App() {
   const account = accounts[0];
 
   return (
-    <div>
-      request from:
-      <div>
-        <span>accounts name: {account?.name}</span>
-        <span>accounts name: {account?.wallet.address}</span>
-      </div>
-      accounts: {}
-      <div>
-        <button>Cancel</button>
-        <button>Agree</button>
-      </div>
+    <div className="panel">
+      <section>
+        <p className="text-base">request from:</p>
+      </section>
+      <section>
+        <h1 className="text-lg"> Accounts </h1>
+        <span>
+          {account?.name} : {account?.wallet.address}
+        </span>
+      </section>
+      <section className="space-x-5 justify-center flex mt-5">
+        <button className="btn-dark">Cancel</button>
+        <button className="btn">Agree</button>
+      </section>
     </div>
   );
 }
