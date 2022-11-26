@@ -3,7 +3,7 @@ import persist from "../service/persist";
 
 function App() {
   const [accounts, setAccounts] = useState<any>([]);
-  console.log("ddd", accounts);
+  const origin = new URLSearchParams(location.search).get("origin");
 
   useEffect(() => {
     async function main() {
@@ -18,7 +18,7 @@ function App() {
   return (
     <div className="panel">
       <section>
-        <p className="text-base">request from:</p>
+        <p className="text-base">request from: {origin} </p>
       </section>
       <section>
         <h1 className="text-lg"> Accounts </h1>

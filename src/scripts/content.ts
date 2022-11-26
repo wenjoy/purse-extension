@@ -9,8 +9,8 @@ s.onload = function () {
 
 window.addEventListener(
   "message",
-  (event) => {
-    console.log("message", event);
+  async (event) => {
+    console.log("receive message from page context: ", event);
 
     // We only accept messages from ourselves
     if (event.source != window) {
@@ -18,9 +18,11 @@ window.addEventListener(
     }
 
     if (event.data.type && event.data.type == "FROM_PAGE") {
-      console.log("Content script received: " + event.data.text);
+      const payload = event.data;
       // port.postMessage(event.data.text);
-      chrome.runtime.sendMessage("OpenPopup");
+      const body = { action: "OpenPopup", payload };
+      const result = await chrome.runtime.sendMessage(JSON.stringify(body));
+      console.log("result", result);
     }
   },
   false
