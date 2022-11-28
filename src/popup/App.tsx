@@ -6,6 +6,7 @@ import Drawer from "../components/drawer";
 import Dropdown from "../components/dropdown";
 import Loader from "../components/loader";
 import Navbar from "../components/navbar";
+import TabPanel from "../components/tabpanel";
 import logger from "../service/logger";
 import persist from "../service/persist";
 import truncate from "../utils/truncate";
@@ -206,11 +207,20 @@ function App() {
         </span>
       </section>
 
-      <section className="container flex-1 flex items-center justify-center">
-        <Loader loading={loading}>
-          <span>{balance} ETH</span>
-        </Loader>
+      <section className="container flex-1 space-y-4 p-5 flex-col">
+        <div className="flex items-center justify-center space-x-2">
+          <span className="text-lg">Balance: </span>
+          <span className="space-x-2">
+            <Loader loading={loading} inline>
+              {balance}
+            </Loader>
+            <span className="text-bold">ETH</span>
+          </span>
+        </div>
+
+        <TabPanel />
       </section>
+
       <section className="w-full flex justify-around">
         {navbar.map(({ name, id }) => (
           <span key={id}>
