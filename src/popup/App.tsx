@@ -59,7 +59,7 @@ const isValidAddress = (address: string) => {
   if (address.length > 0) {
     return true;
   } else {
-    logger.info("logger: invalid address %s", address);
+    logger.info("logger: invalid address");
     return false;
   }
 };
@@ -82,8 +82,6 @@ function App() {
   const [selectedNetwork, setSelectedNetwork] = useState("");
   const [visible, setVisible] = useState(false);
   const counterRef = useRef(0);
-
-  console.info({ name: "test" });
 
   const networks: Network[] = getNetworks();
 
@@ -113,7 +111,7 @@ function App() {
 
   useEffect(() => {
     // For debug with ethers API
-    console.log("logger: ethers ", ethers);
+    console.debug("logger: ethers ", ethers);
   }, []);
 
   useEffect(() => {
