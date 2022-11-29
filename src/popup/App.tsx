@@ -1,3 +1,4 @@
+import { EthersContext } from "../context";
 import { Wallet, ethers, utils } from "ethers";
 import { entropyToMnemonic } from "@ethersproject/hdnode";
 import { useEffect, useRef, useState } from "react";
@@ -12,7 +13,7 @@ import persist from "../service/persist";
 import truncate from "../utils/truncate";
 import useBalance from "../hooks/useBalance";
 
-interface Account {
+export interface Purse {
   name: string;
   wallet: Wallet;
 }
@@ -77,11 +78,12 @@ const getNetworks = () => {
 function App() {
   const [provider, setProvider] = useState<any>();
   const [selected, setSelected] = useState("");
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [accounts, setAccounts] = useState<Purse[]>([]);
   const [selectedNetwork, setSelectedNetwork] = useState("");
   const [visible, setVisible] = useState(false);
   const counterRef = useRef(0);
-  logger.info("test logger");
+
+  console.info({ name: "test" });
 
   const networks: Network[] = getNetworks();
 
@@ -148,13 +150,13 @@ function App() {
     { id: "4", name: "Setting" },
   ];
 
-  const currentAccount = accounts.find(
+  const purse = accounts.find(
     ({ wallet: { address } }) => address === selected
-  );
+  ) as Purse;
 
   const copyHandler = () => {
     navigator.clipboard
-      .writeText(String(currentAccount?.wallet.address))
+      .writeText(String(purse?.wallet.address))
       .then(() => {
         alert("Copied");
       })
@@ -174,6 +176,8 @@ function App() {
     const mnemonic = await getMnemonic();
     const path = `m/44'/60'/0'/0/${counterRef.current++}`;
     const wallet = generateWallet(mnemonic as string, path);
+    console.log("debug", wallet);
+
     accounts.push({ name: `Account ${counterRef.current}`, wallet });
 
     await persist.set("accounts", accounts);
@@ -218,7 +222,9 @@ function App() {
           </span>
         </div>
 
-        <TabPanel />
+        <EthersContext.Provider value={{ purse, provider }}>
+          <TabPanel />
+        </EthersContext.Provider>
       </section>
 
       <section className="w-full flex justify-around">

@@ -4,13 +4,13 @@ chrome.runtime.onMessage.addListener(
     sender: { origin: string },
     sendResponse: (ret: any) => void
   ) => {
-    console.log("received msg: ", message);
-    console.log("sender: ", sender);
-    console.log("sender: ", sender.origin);
-    console.log("sending response: ", sendResponse("send response"));
+    console.debug("received msg: ", message);
+    console.debug("sender: ", sender);
+    console.debug("sender: ", sender.origin);
+    console.debug("sending response: ", sendResponse("send response"));
 
     const { action, payload } = JSON.parse(message);
-    console.log("payload: ", payload);
+    console.debug("payload: ", payload);
 
     if (action == "OpenPopup") {
       chrome.windows.create(
@@ -24,7 +24,7 @@ chrome.runtime.onMessage.addListener(
           left: 800,
         },
         () => {
-          console.log("Opened popup!");
+          console.debug("Opened popup!");
         }
       );
     }

@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { EthersContext } from "../context";
+import { useContext, useState } from "react";
 
 const Send = () => {
   const [address, setAddress] = useState("");
+  const ethers = useContext(EthersContext);
+  console.log("purse", ethers);
+
   const confirmHandler = () => {
     alert(address);
   };
@@ -16,7 +20,7 @@ const Send = () => {
           value={address}
         />
       </div>
-      <button className="btn" onClick={confirmHandler}>
+      <button className="btn-purple" onClick={confirmHandler}>
         Confirm
       </button>
     </div>
