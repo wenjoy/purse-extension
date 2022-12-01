@@ -13,9 +13,14 @@ import persist from "../service/persist";
 import truncate from "../utils/truncate";
 import useBalance from "../hooks/useBalance";
 
-export interface Purse {
+export interface NameWallet {
   name: string;
   wallet: Wallet;
+}
+
+export interface DehydratedWallet {
+  name: string;
+  privateKey: string;
 }
 
 interface Network {
@@ -77,8 +82,8 @@ const getNetworks = () => {
 
 function App() {
   const [provider, setProvider] = useState<any>();
-  const [selected, setSelected] = useState("");
-  const [accounts, setAccounts] = useState<Purse[]>([]);
+  const [selectedWalletAddress, setSelectedWalletAddress] = useState("");
+  const [wallets, setWallets] = useState<NameWallet[]>([]);
   const [selectedNetwork, setSelectedNetwork] = useState("");
   const [visible, setVisible] = useState(false);
   const counterRef = useRef(0);
@@ -89,24 +94,30 @@ function App() {
     label: name,
     value: name,
   }));
-  const accountsOptions = accounts.map(({ name, wallet: { address } }) => ({
+  const walletsOptions = wallets.map(({ name, wallet: { address } }) => ({
     label: `${name} ${truncate(address)}`,
     value: address,
   }));
 
   useEffect(() => {
-    const getAccounts = async () => {
-      const { accounts } = await persist.get("accounts");
+    const recoverWalletsFromStore = async () => {
+      const { wallets } = await persist.get("wallets");
       const { counter } = await persist.get("counter");
-      if (accounts) {
-        setAccounts(accounts);
-        setSelected(accounts[0].wallet.address);
+      if (wallets) {
+        const rehydratedWallets = wallets.map(
+          ({ name, privateKey }: DehydratedWallet) => ({
+            name,
+            wallet: new ethers.Wallet(privateKey),
+          })
+        );
+        setWallets(rehydratedWallets);
+        setSelectedWalletAddress(rehydratedWallets[0].wallet.address);
       }
       if (counter > 0) {
         counterRef.current = counter;
       }
     };
-    getAccounts();
+    recoverWalletsFromStore();
   }, []);
 
   useEffect(() => {
@@ -137,7 +148,7 @@ function App() {
     return balance;
   };
   const { balance, loading } = useBalance(
-    [selected, provider],
+    [selectedWalletAddress, provider],
     (address: Address) => requestBalance(address, provider)
   );
 
@@ -148,13 +159,15 @@ function App() {
     { id: "4", name: "Setting" },
   ];
 
-  const purse = accounts.find(
-    ({ wallet: { address } }) => address === selected
-  ) as Purse;
+  const selectedWallet = wallets.find(
+    ({ wallet: { address } }) => address === selectedWalletAddress
+  ) as NameWallet;
+
+  console.log("wallet", selectedWallet);
 
   const copyHandler = () => {
     navigator.clipboard
-      .writeText(String(purse?.wallet.address))
+      .writeText(String(selectedWallet?.wallet.address))
       .then(() => {
         alert("Copied");
       })
@@ -174,18 +187,20 @@ function App() {
     const mnemonic = await getMnemonic();
     const path = `m/44'/60'/0'/0/${counterRef.current++}`;
     const wallet = generateWallet(mnemonic as string, path);
-    console.log("debug", wallet);
 
-    accounts.push({ name: `Account ${counterRef.current}`, wallet });
+    wallets.push({ name: `Account ${counterRef.current}`, wallet });
+    const dehydratedWallets: DehydratedWallet[] = wallets.map(
+      ({ name, wallet }) => ({ name, privateKey: wallet.privateKey })
+    );
 
-    await persist.set("accounts", accounts);
+    await persist.set("wallets", dehydratedWallets);
     await persist.set("counter", counterRef.current);
 
     hideDrawer();
   };
 
   const selectHandler = (address: string) => {
-    setSelected(address);
+    setSelectedWalletAddress(address);
   };
 
   return (
@@ -193,8 +208,8 @@ function App() {
       <section className="w-full shadow-md py-2.5 flex justify-around items-center">
         <span className="flex items-center justify-between">
           <Dropdown
-            selected={selected}
-            data={accountsOptions}
+            selected={selectedWalletAddress}
+            data={walletsOptions}
             onAdd={showDrawer}
             onSelect={selectHandler}
           />
@@ -220,7 +235,7 @@ function App() {
           </span>
         </div>
 
-        <EthersContext.Provider value={{ purse, provider }}>
+        <EthersContext.Provider value={{ wallet: selectedWallet, provider }}>
           <TabPanel />
         </EthersContext.Provider>
       </section>

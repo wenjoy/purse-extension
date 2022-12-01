@@ -1,8 +1,11 @@
+import { NameWallet } from "../popup/App";
 import { Provider, createContext } from "react";
-import { Purse } from "../popup/App";
 
-const EthersContext = createContext<{ purse: Purse; provider: Provider<any> }>({
-  purse: {} as Purse,
+const EthersContext = createContext<{
+  wallet: NameWallet;
+  provider: Provider<any>;
+}>({
+  wallet: {} as NameWallet,
   provider: {} as Provider<any>,
 });
 
