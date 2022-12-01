@@ -1,23 +1,51 @@
 import { EthersContext } from "../context";
 import { useContext, useState } from "react";
+import { utils } from "ethers";
 
 const Send = () => {
-  const [address, setAddress] = useState("");
-  const ethers = useContext(EthersContext);
-  console.log("purse", ethers);
+  const [reciever, setReciever] = useState("");
+  const [amount, setAmount] = useState("0");
+  const {
+    wallet: { wallet },
+    provider,
+  } = useContext(EthersContext);
+  const sender = wallet.address;
 
-  const confirmHandler = () => {
-    alert(address);
+  const confirmHandler = async () => {
+    const gasPrice = await provider.getGasPrice();
+    const tx = {
+      from: sender,
+      to: reciever,
+      value: utils.parseEther(amount ?? "0"),
+      nonce: provider.getTransactionCount(sender, "latest"),
+      gasLimit: utils.hexlify(100000),
+      gasPrice,
+    };
+    const signer = wallet.connect(provider);
+
+    try {
+      const transaction = signer.sendTransaction(tx);
+      console.debug(transaction);
+    } catch (err) {
+      console.error(err);
+    }
   };
   return (
-    <div className="space-1 flex justify-around mt-10">
+    <div className="space-1 flex flex-col justify-around space-y-2 mt-10">
       <div className="flex flex-col space-y-2">
         <label htmlFor="address">Address: </label>
         <input
           className="outline p-1 rounded-md"
           id="address"
-          onChange={(e) => setAddress(e.target.value)}
-          value={address}
+          onChange={(e) => setReciever(e.target.value)}
+          value={reciever}
+        />
+        <label htmlFor="amount">Amount(ETH): </label>
+        <input
+          className="outline p-1 rounded-md"
+          id="amount"
+          onChange={(e) => setAmount(e.target.value)}
+          value={amount}
         />
       </div>
       <button className="btn-purple" onClick={confirmHandler}>

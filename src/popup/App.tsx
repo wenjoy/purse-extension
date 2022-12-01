@@ -130,7 +130,7 @@ function App() {
       setSelectedNetwork(networks[0].name);
     } else {
       const provider = ethers.getDefaultProvider(selectedNetwork, {
-        alchemy: "v52XdAeZ58ftv3xmWNbqao3k5F1Y_E3V",
+        alchemy: "YA4l5t9NnZlEYLOF0MqW5Dtmn8xKUOAo",
       });
       setProvider(provider);
     }
