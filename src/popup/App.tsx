@@ -204,7 +204,7 @@ function App() {
   };
 
   return (
-    <div className="panel">
+    <div className="panel relative">
       <section className="w-full shadow-md py-2.5 flex justify-around items-center">
         <span className="flex items-center justify-between">
           <Dropdown
