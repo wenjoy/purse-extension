@@ -1,16 +1,11 @@
 import { EthersContext, Provider } from "../context";
-import { NameWallet } from "../popup/App";
 import { utils } from "ethers";
 import Loader from "../components/loader";
 import TabPanel from "../components/tabpanel";
 import logger from "../service/logger";
 import useBalance from "../hooks/useBalance";
 
-type TokenPageProps = {
-  selectedWallet: NameWallet;
-  provider: Provider;
-};
-const TokenPage = ({ selectedWallet, provider }: TokenPageProps) => {
+const TokenPage = ({ selectedWallet, provider }: PageProps) => {
   const isValidAddress = (address: string) => {
     if (address.length > 0) {
       return true;

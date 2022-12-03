@@ -7,6 +7,7 @@ import Drawer from "../components/drawer";
 import Dropdown from "../components/dropdown";
 import NavbarPanel from "../components/navbar-panel";
 import TokenPage from "../components/token-page";
+import TransactionPage from "../components/transaction-page";
 import persist from "../service/persist";
 import truncate from "../utils/truncate";
 
@@ -119,6 +120,7 @@ function App() {
     } else {
       const provider = ethers.getDefaultProvider(selectedNetwork, {
         alchemy: "YA4l5t9NnZlEYLOF0MqW5Dtmn8xKUOAo",
+        etherscan: "C4YT7SIA975H8SYVH51W42MUQG1NENZ2HF",
       });
       setProvider(provider);
     }
@@ -173,7 +175,10 @@ function App() {
       name: "Token",
       page: <TokenPage {...{ provider, selectedWallet }} />,
     },
-    { name: "Transaction", page: <>Transaction</> },
+    {
+      name: "Transaction",
+      page: <TransactionPage {...{ provider, selectedWallet }} />,
+    },
     { name: "Assets", page: <></> },
     { name: "Setting", page: <></> },
   ];
