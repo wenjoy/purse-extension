@@ -1,17 +1,14 @@
-import { EthersContext } from "../context";
-import { Wallet, ethers, utils } from "ethers";
+import { Provider } from "../context";
+import { Wallet, ethers } from "ethers";
 import { entropyToMnemonic } from "@ethersproject/hdnode";
 import { useEffect, useRef, useState } from "react";
 import Copy from "../components/copy";
 import Drawer from "../components/drawer";
 import Dropdown from "../components/dropdown";
-import Loader from "../components/loader";
 import Navbar from "../components/navbar";
-import TabPanel from "../components/tabpanel";
-import logger from "../service/logger";
+import TokenPage from "../components/token-page";
 import persist from "../service/persist";
 import truncate from "../utils/truncate";
-import useBalance from "../hooks/useBalance";
 
 export interface NameWallet {
   name: string;
@@ -60,15 +57,6 @@ const getMnemonic = async () => {
   }
 };
 
-const isValidAddress = (address: string) => {
-  if (address.length > 0) {
-    return true;
-  } else {
-    logger.info("logger: invalid address");
-    return false;
-  }
-};
-
 const getNetworks = () => {
   const networks = [
     { name: "homestead" },
@@ -81,7 +69,7 @@ const getNetworks = () => {
 };
 
 function App() {
-  const [provider, setProvider] = useState<any>();
+  const [provider, setProvider] = useState<Provider>({} as Provider);
   const [selectedWalletAddress, setSelectedWalletAddress] = useState("");
   const [wallets, setWallets] = useState<NameWallet[]>([]);
   const [selectedNetwork, setSelectedNetwork] = useState("");
@@ -138,20 +126,6 @@ function App() {
 
   // const provider = new ethers.providers.JsonRpcProvider();
 
-  const requestBalance = async (selected: Address, provider: any) => {
-    let balance = "";
-
-    if (isValidAddress(selected) && provider) {
-      const value = await provider.getBalance(selected);
-      balance = utils.formatEther(value);
-    }
-    return balance;
-  };
-  const { balance, loading } = useBalance(
-    [selectedWalletAddress, provider],
-    (address: Address) => requestBalance(address, provider)
-  );
-
   const navbar = [
     { id: "1", name: "Token" },
     { id: "2", name: "Assets" },
@@ -162,8 +136,6 @@ function App() {
   const selectedWallet = wallets.find(
     ({ wallet: { address } }) => address === selectedWalletAddress
   ) as NameWallet;
-
-  console.log("wallet", selectedWallet);
 
   const copyHandler = () => {
     navigator.clipboard
@@ -224,21 +196,7 @@ function App() {
         </span>
       </section>
 
-      <section className="container flex-1 space-y-4 p-5 flex-col">
-        <div className="flex items-center justify-center space-x-2">
-          <span className="text-lg">Balance: </span>
-          <span className="space-x-2">
-            <Loader loading={loading} inline>
-              {balance}
-            </Loader>
-            <span className="text-bold">ETH</span>
-          </span>
-        </div>
-
-        <EthersContext.Provider value={{ wallet: selectedWallet, provider }}>
-          <TabPanel />
-        </EthersContext.Provider>
-      </section>
+      <TokenPage {...{ provider, selectedWallet }} />
 
       <section className="w-full flex justify-around">
         {navbar.map(({ name, id }) => (

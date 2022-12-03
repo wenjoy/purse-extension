@@ -1,13 +1,14 @@
 import { NameWallet } from "../popup/App";
 import { createContext } from "react";
-import { providers } from "ethers";
+import { ethers } from "ethers";
 
+export type Provider = ethers.providers.Provider;
 const EthersContext = createContext<{
   wallet: NameWallet;
-  provider: providers.BaseProvider;
+  provider: Provider;
 }>({
   wallet: {} as NameWallet,
-  provider: {} as providers.BaseProvider,
+  provider: {} as Provider,
 });
 
 export { EthersContext };
