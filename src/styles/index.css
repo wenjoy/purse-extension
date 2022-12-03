@@ -16,7 +16,7 @@
   }
 
   .panel {
-    @apply container h-[600px] w-[400px] py-2.5 flex flex-col shadow-md p-3
+    @apply container h-[600px] w-[400px] flex flex-col shadow-md
   }
 }
 

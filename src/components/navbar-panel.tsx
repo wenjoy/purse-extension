@@ -41,7 +41,7 @@ const NavbarPanel = ({ navbar }: NavbarPanelProps) => {
       <section className="flex-1">{page}</section>
 
       <nav className="relative w-full flex py-3 bg-gray-900 text-gray-200 shadow-lg">
-        <ul className="flex flex-wrap items-center justify-between w-full pl-0 list-style-none mr-auto">
+        <ul className="flex flex-wrap items-center justify-around w-full pl-0 list-style-none mr-auto">
           {navbar.map(({ name }, index) => (
             <NavbarItem
               key={name}
