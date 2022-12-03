@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import Copy from "../components/copy";
 import Drawer from "../components/drawer";
 import Dropdown from "../components/dropdown";
-import Navbar from "../components/navbar";
+import NavbarPanel from "../components/navbar-panel";
 import TokenPage from "../components/token-page";
 import persist from "../service/persist";
 import truncate from "../utils/truncate";
@@ -126,13 +126,6 @@ function App() {
 
   // const provider = new ethers.providers.JsonRpcProvider();
 
-  const navbar = [
-    { id: "1", name: "Token" },
-    { id: "2", name: "Assets" },
-    { id: "3", name: "Transaction" },
-    { id: "4", name: "Setting" },
-  ];
-
   const selectedWallet = wallets.find(
     ({ wallet: { address } }) => address === selectedWalletAddress
   ) as NameWallet;
@@ -175,6 +168,16 @@ function App() {
     setSelectedWalletAddress(address);
   };
 
+  const navbar = [
+    {
+      name: "Token",
+      page: <TokenPage {...{ provider, selectedWallet }} />,
+    },
+    { name: "Transaction", page: <>Transaction</> },
+    { name: "Assets", page: <></> },
+    { name: "Setting", page: <></> },
+  ];
+
   return (
     <div className="panel relative">
       <section className="w-full shadow-md py-2.5 flex justify-around items-center">
@@ -196,15 +199,7 @@ function App() {
         </span>
       </section>
 
-      <TokenPage {...{ provider, selectedWallet }} />
-
-      <section className="w-full flex justify-around">
-        {navbar.map(({ name, id }) => (
-          <span key={id}>
-            <Navbar name={name} />
-          </span>
-        ))}
-      </section>
+      <NavbarPanel {...{ navbar }} />
 
       <Drawer visible={visible} onClose={hideDrawer}>
         <button className="btn" onClick={creatAccont}>
