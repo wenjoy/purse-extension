@@ -177,7 +177,9 @@ function App() {
     },
     {
       name: "Transaction",
-      page: <TransactionPage {...{ provider, selectedWallet }} />,
+      page: (
+        <TransactionPage {...{ provider, selectedWallet, selectedNetwork }} />
+      ),
     },
     { name: "Assets", page: <></> },
     { name: "Setting", page: <></> },
