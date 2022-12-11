@@ -77,6 +77,8 @@ function App() {
   const [visible, setVisible] = useState(false);
   const counterRef = useRef(0);
 
+  window.provider = provider;
+
   const networks: Network[] = getNetworks();
 
   const networksOptions = networks.map(({ name }) => ({
@@ -131,6 +133,10 @@ function App() {
   const selectedWallet = wallets.find(
     ({ wallet: { address } }) => address === selectedWalletAddress
   ) as NameWallet;
+
+  useEffect(() => {
+    chrome.runtime.sendMessage({ action: "WALLET", payload: selectedWallet });
+  }, [selectedWallet]);
 
   const copyHandler = () => {
     navigator.clipboard

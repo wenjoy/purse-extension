@@ -1,3 +1,8 @@
+interface Window {
+  getProvider: () => Promise;
+  provider: any;
+}
+
 declare let chrome: {
   storage: {
     local: {

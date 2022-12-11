@@ -10,7 +10,7 @@ s.onload = function () {
 window.addEventListener(
   "message",
   async (event) => {
-    console.debug("receive message from page context: ", event);
+    console.debug("receive post message from page context: ", event);
 
     // We only accept messages from ourselves
     if (event.source != window) {
@@ -30,13 +30,23 @@ window.addEventListener(
       // port.postMessage(event.data.text);
       console.debug("result from popup: ", payload);
     }
+
+    if (event.data.type && event.data.type == "GET_PROVIDER") {
+      const body = { action: "GET_PROVIDER" };
+      await chrome.runtime.sendMessage(JSON.stringify(body));
+    }
   },
   false
 );
 
 chrome.runtime.onMessage.addListener(
   (request: any, sender: any, sendResponse: any) => {
-    console.debug("content recieve message: ", request, sender, sendResponse);
+    console.debug(
+      "recieve chrome runtime message: ",
+      request,
+      sender,
+      sendResponse
+    );
 
     console.debug(
       sender.tab
