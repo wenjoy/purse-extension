@@ -32,8 +32,17 @@ window.addEventListener(
     }
 
     if (event.data.type && event.data.type == "GET_PROVIDER") {
-      const body = { action: "GET_PROVIDER" };
-      await chrome.runtime.sendMessage(JSON.stringify(body));
+      // let's see if object method can be pass through postMessage
+      const testObj = {
+        name: "test",
+        say() {
+          return this.name;
+        },
+      };
+
+      window.postMessage({ type: "PROVIDER", payload: testObj });
+      // const body = { action: "GET_PROVIDER" };
+      // await chrome.runtime.sendMessage(JSON.stringify(body));
     }
   },
   false

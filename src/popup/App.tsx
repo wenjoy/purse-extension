@@ -135,6 +135,8 @@ function App() {
   ) as NameWallet;
 
   useEffect(() => {
+    console.log("selected wallet", selectedWallet);
+
     chrome.runtime.sendMessage({ action: "WALLET", payload: selectedWallet });
   }, [selectedWallet]);
 
