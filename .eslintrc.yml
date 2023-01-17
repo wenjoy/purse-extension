@@ -25,3 +25,4 @@ rules:
   autofix/no-unused-vars: error
   # autofix/no-console: error
   sort-imports-es6-autofix/sort-imports-es6: error
+  "@typescript-eslint/ban-ts-comment": off

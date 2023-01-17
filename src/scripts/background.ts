@@ -1,7 +1,14 @@
 // import { ethers } from "ethers";
 
+import persist from "../service/persist";
+
 //eslint-disable-next-line
 let wallet: any = null;
+
+enum Event {
+  eth_accounts = "eth_accounts",
+  eth_chainId = "eth_chainId",
+}
 
 chrome.runtime.onMessage.addListener(
   async (
@@ -35,19 +42,28 @@ chrome.runtime.onMessage.addListener(
       );
     }
 
-    if (action === "GET_PROVIDER") {
-      // const provider = ethers.getDefaultProvider('goerli', {
-      //   alchemy: "YA4l5t9NnZlEYLOF0MqW5Dtmn8xKUOAo",
-      //   etherscan: "C4YT7SIA975H8SYVH51W42MUQG1NENZ2HF",
-      // });
-
+    if (action === Event.eth_accounts) {
+      console.debug("background--eth_accounts", Event.eth_accounts);
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
-        console.debug("background--provider", wallet, tabs);
         chrome.tabs.sendMessage(tabs[0].id, {
-          type: "PROVIDER",
+          type: Event.eth_accounts,
           payload: wallet,
         });
       });
+    }
+
+    if (action === Event.eth_chainId) {
+      console.log("background--eth_chainId", Event.eth_chainId);
+      chrome.tabs.query(
+        { active: true, currentWindow: true },
+        async (tabs: any) => {
+          const { chainId } = await persist.get("selectedNetwork");
+          chrome.tabs.sendMessage(tabs[0].id, {
+            type: Event.eth_accounts,
+            payload: chainId,
+          });
+        }
+      );
     }
 
     if (action === "WALLET") {

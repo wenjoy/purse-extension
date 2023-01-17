@@ -128,12 +128,25 @@ function App() {
     }
   }, [selectedNetwork]);
 
+  useEffect(() => {
+    persistNetwork();
+    async function persistNetwork() {
+      try {
+        const network = await provider.getNetwork();
+        persist.set("selectedNetwork", network);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }, [provider]);
+
   // const provider = new ethers.providers.JsonRpcProvider();
 
   const selectedWallet = wallets.find(
     ({ wallet: { address } }) => address === selectedWalletAddress
   ) as NameWallet;
 
+  // TODO: use background js as only trust store
   useEffect(() => {
     console.log("selected wallet", selectedWallet);
 

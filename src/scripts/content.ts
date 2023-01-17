@@ -6,7 +6,6 @@ s.onload = function () {
 (document.head || document.documentElement).appendChild(s);
 
 // var port = chrome.runtime.connect();
-
 window.addEventListener(
   "message",
   async (event) => {
@@ -31,18 +30,11 @@ window.addEventListener(
       console.debug("result from popup: ", payload);
     }
 
-    if (event.data.type && event.data.type == "GET_PROVIDER") {
-      // let's see if object method can be pass through postMessage
-      const testObj = {
-        name: "test",
-        say() {
-          return this.name;
-        },
-      };
-
-      window.postMessage({ type: "PROVIDER", payload: testObj });
-      // const body = { action: "GET_PROVIDER" };
-      // await chrome.runtime.sendMessage(JSON.stringify(body));
+    if (event.data.method) {
+      await chrome.runtime.sendMessage({
+        action: event.data.method,
+        payload: event.data.params,
+      });
     }
   },
   false
