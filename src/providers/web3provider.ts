@@ -12,8 +12,8 @@ export default class Web3Provider {
     return new Promise<any>((res, rej) => {
       window.postMessage(request);
 
-      window.addEventListener("message", ({ data }) => {
-        console.log("web3provider--", data);
+      window.addEventListener("message", ({ data, origin, source }) => {
+        console.log("web3provider--", data, origin, source);
         switch (data.type) {
           case Event.eth_accounts: {
             const account = data.payload?.wallet?.address;

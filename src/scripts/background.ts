@@ -5,27 +5,37 @@ import persist from "../service/persist";
 //eslint-disable-next-line
 let wallet: any = null;
 
-enum Event {
+enum Action {
   eth_accounts = "eth_accounts",
   eth_chainId = "eth_chainId",
+  open_popup = "OpenPopup",
+  set_wallet = "WALLET",
 }
+
+type Message = {
+  action: Action;
+  payload: any;
+};
 
 chrome.runtime.onMessage.addListener(
   async (
-    message: string,
+    message: any,
     sender: { origin: string },
     sendResponse: (ret: any) => void
   ) => {
-    console.debug("received msg: ", message);
-    console.debug("sender: ", sender);
-    console.debug("sender: ", sender.origin);
-    console.debug("sending response: ", sendResponse("send response"));
+    console.debug(
+      "received msg from content(message, sender, sendResponse): ",
+      message,
+      sender,
+      sendResponse
+    );
 
-    const { action, payload } =
-      (typeof message as string) === "string" ? JSON.parse(message) : message;
-    console.debug("payload: ", payload);
+    //TODO: no need to parse, always requre sender send obeject
+    // const { action, payload } =
+    //   (typeof message as string) === "string" ? JSON.parse(message) : message;
+    const { action, payload }: Message = message;
 
-    if (action == "OpenPopup") {
+    if (action == Action.open_popup) {
       chrome.windows.create(
         {
           url: `connect.html?origin=${sender.origin}`,
@@ -42,31 +52,31 @@ chrome.runtime.onMessage.addListener(
       );
     }
 
-    if (action === Event.eth_accounts) {
-      console.debug("background--eth_accounts", Event.eth_accounts);
+    if (action === Action.eth_accounts) {
+      console.debug("background--eth_accounts", Action.eth_accounts);
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
         chrome.tabs.sendMessage(tabs[0].id, {
-          type: Event.eth_accounts,
+          type: Action.eth_accounts,
           payload: wallet,
         });
       });
     }
 
-    if (action === Event.eth_chainId) {
-      console.log("background--eth_chainId", Event.eth_chainId);
+    if (action === Action.eth_chainId) {
+      console.log("background--eth_chainId", Action.eth_chainId);
       chrome.tabs.query(
         { active: true, currentWindow: true },
         async (tabs: any) => {
           const { chainId } = await persist.get("selectedNetwork");
           chrome.tabs.sendMessage(tabs[0].id, {
-            type: Event.eth_accounts,
+            type: Action.eth_accounts,
             payload: chainId,
           });
         }
       );
     }
 
-    if (action === "WALLET") {
+    if (action === Action.set_wallet) {
       console.log("set wallet");
       wallet = payload;
     }
