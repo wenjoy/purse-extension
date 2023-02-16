@@ -1,5 +1,3 @@
-// import { ethers } from "ethers";
-
 import persist from "../service/persist";
 
 //eslint-disable-next-line
@@ -16,6 +14,9 @@ type Message = {
   action: Action;
   payload: any;
 };
+
+// TODO: setup store as a local database
+// const store = new Store();
 
 chrome.runtime.onMessage.addListener(
   async (
@@ -53,8 +54,9 @@ chrome.runtime.onMessage.addListener(
     }
 
     if (action === Action.eth_accounts) {
-      console.debug("background--eth_accounts", Action.eth_accounts);
+      console.log("background--eth_accounts", Action.eth_accounts);
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
+        console.log("background--web3provider--request", "send message back");
         chrome.tabs.sendMessage(tabs[0].id, {
           type: Action.eth_accounts,
           payload: wallet,
@@ -69,7 +71,7 @@ chrome.runtime.onMessage.addListener(
         async (tabs: any) => {
           const { chainId } = await persist.get("selectedNetwork");
           chrome.tabs.sendMessage(tabs[0].id, {
-            type: Action.eth_accounts,
+            type: Action.eth_chainId,
             payload: chainId,
           });
         }

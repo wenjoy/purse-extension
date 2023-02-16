@@ -25,8 +25,8 @@ window.openWallet = ({ message }: { message: string }): Promise => {
   });
 };
 
+const provider = new Web3Provider();
 window.getProvider = () => {
-  const provider = new Web3Provider();
   return provider;
 };
 

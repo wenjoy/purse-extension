@@ -8,6 +8,7 @@ function injectScript() {
 }
 
 function startMessageMiddleware() {
+  console.log("content--startMessageMiddleware", "should execute once");
   window.addEventListener(
     "message",
     async (event) => {
@@ -16,7 +17,13 @@ function startMessageMiddleware() {
         return;
       }
 
+      // exclude message posted from contentjs itself
+      if (event.data.isContent) {
+        return;
+      }
+
       try {
+        console.debug("Send message", event);
         const result = await chrome.runtime.sendMessage(event.data);
         console.debug("Send message result", result);
       } catch (error) {
@@ -56,8 +63,7 @@ function startMessageMiddleware() {
         sender,
         sendResponse
       );
-
-      window.postMessage(request, "*");
+      window.postMessage({ ...request, isContent: true });
     }
   );
 }
