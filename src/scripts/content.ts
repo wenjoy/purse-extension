@@ -8,7 +8,6 @@ function injectScript() {
 }
 
 function startMessageMiddleware() {
-  console.log("content--startMessageMiddleware", "should execute once");
   window.addEventListener(
     "message",
     async (event) => {
@@ -17,15 +16,8 @@ function startMessageMiddleware() {
         return;
       }
 
-      // exclude message posted from contentjs itself
-      if (event.data.isContent) {
-        return;
-      }
-
       try {
-        console.debug("Send message", event);
-        const result = await chrome.runtime.sendMessage(event.data);
-        console.debug("Send message result", result);
+        await chrome.runtime.sendMessage(event.data);
       } catch (error) {
         console.error("Send message to extension error: ", error);
       }
@@ -63,7 +55,7 @@ function startMessageMiddleware() {
         sender,
         sendResponse
       );
-      window.postMessage({ ...request, isContent: true });
+      window.postMessage(request);
     }
   );
 }

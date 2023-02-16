@@ -11,7 +11,6 @@ type handler = { res: callback; rej: callback };
 export default class Web3Provider {
   listeners: { [key: string]: handler } = {};
   constructor() {
-    console.log("web3provider--constructor", "should excute once");
     window.addEventListener("message", ({ data, source }) => {
       if (source != window) {
         console.debug("filter message send from self");
@@ -22,13 +21,11 @@ export default class Web3Provider {
         return;
       }
 
-      console.log("web3provider--     response       ", data, source);
       this.emit(data.type, data);
     });
   }
   emit(type: string, data: any) {
     const { res, rej } = this.listeners[type];
-    console.log("web3provider--type", type);
     switch (type) {
       case Event.eth_accounts: {
         const account = data.payload?.wallet?.address;
@@ -54,16 +51,17 @@ export default class Web3Provider {
     this.listeners[type] = handler;
   }
   request(request: { method: string; params?: any[] | undefined }) {
-    console.log("web3provider--request", request);
     return new Promise<any>((res, rej) => {
       window.postMessage({ action: request.method, payload: request.params });
       this.listen(request.method, { res, rej });
     });
   }
   on() {
-    console.log("web3provider--on");
+    // TODO: Specifician required interface, implement later
+    console.debug("web3provider--on");
   }
   removeListener() {
-    console.log("web3provider--removeListener");
+    // TODO: Specifician required interface, implement later
+    console.debug("web3provider--removeListener");
   }
 }

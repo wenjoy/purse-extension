@@ -54,9 +54,7 @@ chrome.runtime.onMessage.addListener(
     }
 
     if (action === Action.eth_accounts) {
-      console.log("background--eth_accounts", Action.eth_accounts);
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
-        console.log("background--web3provider--request", "send message back");
         chrome.tabs.sendMessage(tabs[0].id, {
           type: Action.eth_accounts,
           payload: wallet,
@@ -65,7 +63,6 @@ chrome.runtime.onMessage.addListener(
     }
 
     if (action === Action.eth_chainId) {
-      console.log("background--eth_chainId", Action.eth_chainId);
       chrome.tabs.query(
         { active: true, currentWindow: true },
         async (tabs: any) => {
@@ -79,7 +76,6 @@ chrome.runtime.onMessage.addListener(
     }
 
     if (action === Action.set_wallet) {
-      console.log("set wallet");
       wallet = payload;
     }
   }
