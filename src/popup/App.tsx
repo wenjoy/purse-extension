@@ -23,6 +23,7 @@ export interface DehydratedWallet {
 
 interface Network {
   name: string;
+  value: string;
   rpcUrl?: string;
   chainId?: number;
   symbol?: string;
@@ -60,11 +61,12 @@ const getMnemonic = async () => {
 
 const getNetworks = () => {
   const networks = [
-    { name: "homestead" },
-    { name: "goerli" },
-    { name: "matic" },
-    { name: "arbitrum" },
-    { name: "optimism" },
+    { value: "homestead", name: "homestead" },
+    { value: "goerli", name: "goerli" },
+    { value: "matic", name: "matic" },
+    { value: "arbitrum", name: "arbitrum" },
+    { value: "optimism", name: "optimism" },
+    { value: "http://localhost:8545", name: "localhost" },
   ];
   return networks;
 };
@@ -76,14 +78,15 @@ function App() {
   const [selectedNetwork, setSelectedNetwork] = useState("");
   const [visible, setVisible] = useState(false);
   const counterRef = useRef(0);
+  const [privateKey, setPrivateKey] = useState<string>("");
 
   window.provider = provider;
 
   const networks: Network[] = getNetworks();
 
-  const networksOptions = networks.map(({ name }) => ({
+  const networksOptions = networks.map(({ name, value }) => ({
     label: name,
-    value: name,
+    value,
   }));
   const walletsOptions = wallets.map(({ name, wallet: { address } }) => ({
     label: `${name} ${truncate(address)}`,
@@ -118,7 +121,7 @@ function App() {
 
   useEffect(() => {
     if (selectedNetwork === "") {
-      setSelectedNetwork(networks[0].name);
+      setSelectedNetwork(networks[0].value);
     } else {
       const provider = ethers.getDefaultProvider(selectedNetwork, {
         alchemy: "YA4l5t9NnZlEYLOF0MqW5Dtmn8xKUOAo",
@@ -187,6 +190,18 @@ function App() {
     hideDrawer();
   };
 
+  const importAccount = () => {
+    const trimedPrivateKey = privateKey.trim();
+    if (!trimedPrivateKey) {
+      alert("private key cann't be empty");
+    }
+
+    const wallet = new ethers.Wallet(trimedPrivateKey);
+    wallets.push({ name: "imported", wallet });
+    //TODO: persist
+    hideDrawer();
+  };
+
   const selectHandler = (address: string) => {
     setSelectedWalletAddress(address);
   };
@@ -230,10 +245,22 @@ function App() {
       <NavbarPanel {...{ navbar }} />
 
       <Drawer visible={visible} onClose={hideDrawer}>
-        <button className="btn" onClick={creatAccont}>
-          Create a new account
-        </button>
-        <button className="btn">Import from private key</button>
+        <div>
+          <button className="btn" onClick={creatAccont}>
+            Create a new account
+          </button>
+        </div>
+        <div>
+          <input
+            className="p-2 border-solid border"
+            onChange={(e) => {
+              setPrivateKey(e.target.value);
+            }}
+          />
+          <button className="btn" onClick={importAccount}>
+            Import from private key
+          </button>
+        </div>
       </Drawer>
     </div>
   );

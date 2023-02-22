@@ -87,7 +87,8 @@ chrome.runtime.onMessage.addListener(
         selectedNetwork: { name },
       } = network;
 
-      const provider = ethers.getDefaultProvider(name, {
+      const networkName = name === "unknown" ? "http://localhost:8545" : name;
+      const provider = ethers.getDefaultProvider(networkName, {
         alchemy: "YA4l5t9NnZlEYLOF0MqW5Dtmn8xKUOAo",
         etherscan: "C4YT7SIA975H8SYVH51W42MUQG1NENZ2HF",
       });
