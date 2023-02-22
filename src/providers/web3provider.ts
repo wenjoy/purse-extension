@@ -25,11 +25,13 @@ export default class Web3Provider {
     });
   }
   emit(type: string, data: any) {
+    console.log("web3provider--log", "response", type, data);
     const { res, rej } = this.listeners[type];
     switch (type) {
       case Event.eth_accounts: {
         const account = data.payload?.wallet?.address;
         if (account) {
+          console.log("web3provider--log", "accounts", account);
           res([account]);
         } else {
           rej("Get account error");
@@ -37,8 +39,9 @@ export default class Web3Provider {
         break;
       }
       case Event.eth_chainId: {
-        const chainId = data.payload?.chainId;
+        const chainId = data.payload;
         if (chainId) {
+          console.log("web3provider--log", "chainId", chainId);
           res(chainId);
         } else {
           rej("Get chainId error");
@@ -51,6 +54,7 @@ export default class Web3Provider {
     this.listeners[type] = handler;
   }
   request(request: { method: string; params?: any[] | undefined }) {
+    console.log("web3provider--log", request);
     return new Promise<any>((res, rej) => {
       window.postMessage({ action: request.method, payload: request.params });
       this.listen(request.method, { res, rej });

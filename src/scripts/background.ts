@@ -1,3 +1,4 @@
+import { ethers } from "ethers";
 import persist from "../service/persist";
 
 //eslint-disable-next-line
@@ -6,6 +7,7 @@ let wallet: any = null;
 enum Action {
   eth_accounts = "eth_accounts",
   eth_chainId = "eth_chainId",
+  eth_call = "eth_call",
   open_popup = "OpenPopup",
   set_wallet = "WALLET",
 }
@@ -66,13 +68,31 @@ chrome.runtime.onMessage.addListener(
       chrome.tabs.query(
         { active: true, currentWindow: true },
         async (tabs: any) => {
-          const { chainId } = await persist.get("selectedNetwork");
+          const network = await persist.get("selectedNetwork");
+
+          const {
+            selectedNetwork: { chainId },
+          } = network;
           chrome.tabs.sendMessage(tabs[0].id, {
             type: Action.eth_chainId,
             payload: chainId,
           });
         }
       );
+    }
+
+    if (action === Action.eth_call) {
+      const network = await persist.get("selectedNetwork");
+      const {
+        selectedNetwork: { name },
+      } = network;
+
+      const provider = ethers.getDefaultProvider(name, {
+        alchemy: "YA4l5t9NnZlEYLOF0MqW5Dtmn8xKUOAo",
+        etherscan: "C4YT7SIA975H8SYVH51W42MUQG1NENZ2HF",
+      });
+      const result = await provider.call(payload[0]);
+      console.debug("background--result", result);
     }
 
     if (action === Action.set_wallet) {
