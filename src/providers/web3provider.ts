@@ -4,6 +4,7 @@
 enum Event {
   eth_accounts = "eth_accounts",
   eth_chainId = "eth_chainId",
+  eth_call = "eth_call",
 }
 
 type callback = (value: any) => void;
@@ -45,6 +46,16 @@ export default class Web3Provider {
           res(chainId);
         } else {
           rej("Get chainId error");
+        }
+        break;
+      }
+      case Event.eth_call: {
+        const result = data.payload;
+        console.log("web3provider-55", result);
+        if (result) {
+          res(result);
+        } else {
+          rej("eth contract error");
         }
         break;
       }

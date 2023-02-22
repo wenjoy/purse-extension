@@ -94,6 +94,15 @@ chrome.runtime.onMessage.addListener(
       });
       const result = await provider.call(payload[0]);
       console.debug("background--result", result);
+      chrome.tabs.query(
+        { active: true, currentWindow: true },
+        async (tabs: any) => {
+          chrome.tabs.sendMessage(tabs[0].id, {
+            type: Action.eth_call,
+            payload: result,
+          });
+        }
+      );
     }
 
     if (action === Action.set_wallet) {
