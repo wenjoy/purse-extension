@@ -1,3 +1,4 @@
+import { Action } from "../scripts/background";
 import { Provider } from "../context";
 import { Wallet, ethers } from "ethers";
 import { entropyToMnemonic } from "@ethersproject/hdnode";
@@ -147,17 +148,20 @@ function App() {
     }
   }, [provider]);
 
-  // const provider = new ethers.providers.JsonRpcProvider();
-
   const selectedWallet = wallets.find(
     ({ wallet: { address } }) => address === selectedWalletAddress
   ) as NameWallet;
 
-  // TODO: use background js as only trust store
   useEffect(() => {
-    console.log("selected wallet", selectedWallet);
+    console.log("App-156-selectedWallet", selectedWallet);
+    if (!selectedWallet?.wallet) {
+      return;
+    }
 
-    chrome.runtime.sendMessage({ action: "WALLET", payload: selectedWallet });
+    chrome.runtime.sendMessage({
+      action: Action.set_wallet_privateKey,
+      payload: selectedWallet.wallet.privateKey,
+    });
   }, [selectedWallet]);
 
   const copyHandler = () => {

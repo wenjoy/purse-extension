@@ -11,12 +11,11 @@ enum Event {
   eth_sendTransaction = "eth_sendTransaction",
 }
 
-//eslint-disable-next-line
-let wallet: any = null;
+let walletPricateKey = "";
 
-enum Action {
+export enum Action {
   open_popup = "OpenPopup",
-  set_wallet = "WALLET",
+  set_wallet_privateKey = "WALLET",
 }
 
 type Message = {
@@ -44,6 +43,16 @@ chrome.runtime.onMessage.addListener(
     // const { action, payload } =
     //   (typeof message as string) === "string" ? JSON.parse(message) : message;
     const { action, payload }: Message = message;
+    const network = await persist.get("selectedNetwork");
+    const {
+      selectedNetwork: { name },
+    } = network;
+
+    const networkName = name === "unknown" ? "http://localhost:8545" : name;
+    const provider = ethers.getDefaultProvider(networkName, {
+      alchemy: "YA4l5t9NnZlEYLOF0MqW5Dtmn8xKUOAo",
+      etherscan: "C4YT7SIA975H8SYVH51W42MUQG1NENZ2HF",
+    });
 
     if (action == Action.open_popup) {
       chrome.windows.create(
@@ -63,6 +72,10 @@ chrome.runtime.onMessage.addListener(
     }
 
     if (action === Event.eth_accounts) {
+      if (!walletPricateKey) {
+        return;
+      }
+      const wallet = new ethers.Wallet(walletPricateKey);
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs: any) => {
         chrome.tabs.sendMessage(tabs[0].id, {
           type: Event.eth_accounts,
@@ -87,17 +100,6 @@ chrome.runtime.onMessage.addListener(
         }
       );
     }
-
-    const network = await persist.get("selectedNetwork");
-    const {
-      selectedNetwork: { name },
-    } = network;
-
-    const networkName = name === "unknown" ? "http://localhost:8545" : name;
-    const provider = ethers.getDefaultProvider(networkName, {
-      alchemy: "YA4l5t9NnZlEYLOF0MqW5Dtmn8xKUOAo",
-      etherscan: "C4YT7SIA975H8SYVH51W42MUQG1NENZ2HF",
-    });
 
     if (action === Event.eth_call) {
       const result = await provider.call(payload[0]);
@@ -142,10 +144,24 @@ chrome.runtime.onMessage.addListener(
     }
 
     if (action === Event.eth_sendTransaction) {
+      if (!walletPricateKey) {
+        return;
+      }
+
+      const wallet = new ethers.Wallet(walletPricateKey);
       const transaction = payload[0];
+      const blockNumber = await provider.getBlockNumber();
+      const nonce = blockNumber;
+      transaction.gasPrice = transaction.gas;
+      // at least 21864, maximum is 30000000
+      transaction.gasLimit = BigInt(30000000);
+      transaction.nonce = nonce;
+      delete transaction.gas;
+
+      // const result1 = await wallet.populateTransaction(transaction);
+      // console.log('background-158-result1', result1);
       console.log("background-146-transaction", transaction);
-      console.log("background-147", wallet);
-      const signedTransaction = wallet.signTransaction(transaction);
+      const signedTransaction = await wallet.signTransaction(transaction);
       console.log("background-150-signedTransaction", signedTransaction);
       const result = await provider.sendTransaction(signedTransaction);
       console.log("background-148-result", result);
@@ -161,8 +177,8 @@ chrome.runtime.onMessage.addListener(
       );
     }
 
-    if (action === Action.set_wallet) {
-      wallet = payload;
+    if (action === Action.set_wallet_privateKey) {
+      walletPricateKey = payload;
     }
   }
 );

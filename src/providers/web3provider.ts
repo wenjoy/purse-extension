@@ -35,9 +35,9 @@ export default class Web3Provider {
     const { res, rej } = this.listeners[type];
     switch (type) {
       case Event.eth_accounts: {
-        const account = data.payload?.wallet?.address;
+        console.log("web3provider-39-account", data);
+        const account = data.payload?.address;
         if (account) {
-          console.log("web3provider--log", "accounts", account);
           res([account]);
         } else {
           rej("Get account error");
