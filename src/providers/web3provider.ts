@@ -1,10 +1,15 @@
 //The Provider API specification consists of a single method and five events.
 // https://eips.ethereum.org/EIPS/eip-1193
 
+// export enum Event {
+// this will cause syntax error: Uncaught SyntaxError: Cannot use import statement outside a module
 enum Event {
   eth_accounts = "eth_accounts",
   eth_chainId = "eth_chainId",
   eth_call = "eth_call",
+  eth_blockNumber = "eth_blockNumber",
+  eth_estimateGas = "eth_estimateGas",
+  eth_sendTransaction = "eth_sendTransaction",
 }
 
 type callback = (value: any) => void;
@@ -56,6 +61,36 @@ export default class Web3Provider {
           res(result);
         } else {
           rej("eth contract error");
+        }
+        break;
+      }
+      case Event.eth_blockNumber: {
+        const blockNumber = data.payload;
+        console.log("web3provider-65-blockNumber", blockNumber);
+        if (blockNumber) {
+          res(blockNumber);
+        } else {
+          rej("get blockNumber error");
+        }
+        break;
+      }
+      case Event.eth_estimateGas: {
+        const gas = data.payload;
+        console.log("web3provider-65-gas", gas);
+        if (gas) {
+          res(gas);
+        } else {
+          rej("get blockNumber error");
+        }
+        break;
+      }
+      case Event.eth_sendTransaction: {
+        const result = data.payload;
+        console.log("web3provider-65-gas", result);
+        if (result) {
+          res(result);
+        } else {
+          rej("send transaction error");
         }
         break;
       }

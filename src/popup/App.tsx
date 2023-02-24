@@ -135,6 +135,10 @@ function App() {
     persistNetwork();
     async function persistNetwork() {
       try {
+        if (!provider.getNetwork) {
+          return;
+        }
+
         const network = await provider.getNetwork();
         persist.set("selectedNetwork", network);
       } catch (err) {
@@ -190,7 +194,7 @@ function App() {
     hideDrawer();
   };
 
-  const importAccount = () => {
+  const importAccount = async () => {
     const trimedPrivateKey = privateKey.trim();
     if (!trimedPrivateKey) {
       alert("private key cann't be empty");
@@ -198,6 +202,10 @@ function App() {
 
     const wallet = new ethers.Wallet(trimedPrivateKey);
     wallets.push({ name: "imported", wallet });
+    const dehydratedWallets: DehydratedWallet[] = wallets.map(
+      ({ name, wallet }) => ({ name, privateKey: wallet.privateKey })
+    );
+    await persist.set("wallets", dehydratedWallets);
     //TODO: persist
     hideDrawer();
   };
