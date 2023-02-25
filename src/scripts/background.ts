@@ -9,6 +9,7 @@ enum Event {
   eth_blockNumber = "eth_blockNumber",
   eth_estimateGas = "eth_estimateGas",
   eth_sendTransaction = "eth_sendTransaction",
+  eth_getTransactionByHash = "eth_getTransactionByHash",
 }
 
 let walletPricateKey = "";
@@ -158,20 +159,31 @@ chrome.runtime.onMessage.addListener(
       transaction.nonce = nonce;
       delete transaction.gas;
 
-      // const result1 = await wallet.populateTransaction(transaction);
-      // console.log('background-158-result1', result1);
-      console.log("background-146-transaction", transaction);
       const signedTransaction = await wallet.signTransaction(transaction);
-      console.log("background-150-signedTransaction", signedTransaction);
       const result = await provider.sendTransaction(signedTransaction);
-      console.log("background-148-result", result);
 
       chrome.tabs.query(
         { active: true, currentWindow: true },
         async (tabs: any) => {
           chrome.tabs.sendMessage(tabs[0].id, {
-            type: Event.eth_estimateGas,
-            payload: result,
+            type: Event.eth_sendTransaction,
+            payload: result.hash,
+          });
+        }
+      );
+    }
+
+    if (action === Event.eth_getTransactionByHash) {
+      console.log("background-178-payload", payload);
+      const transaction = await provider.getTransaction(payload[0]);
+      console.log("background-179-transaction", transaction);
+
+      chrome.tabs.query(
+        { active: true, currentWindow: true },
+        async (tabs: any) => {
+          chrome.tabs.sendMessage(tabs[0].id, {
+            type: Event.eth_getTransactionByHash,
+            payload: transaction,
           });
         }
       );

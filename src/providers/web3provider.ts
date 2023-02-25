@@ -10,6 +10,7 @@ enum Event {
   eth_blockNumber = "eth_blockNumber",
   eth_estimateGas = "eth_estimateGas",
   eth_sendTransaction = "eth_sendTransaction",
+  eth_getTransactionByHash = "eth_getTransactionByHash",
 }
 
 type callback = (value: any) => void;
@@ -30,13 +31,13 @@ export default class Web3Provider {
       this.emit(data.type, data);
     });
   }
-  emit(type: string, data: any) {
-    console.log("web3provider--log", "response", type, data);
+  emit(type: string, params: any) {
+    console.log("web3provider--log", "response", type, params);
     const { res, rej } = this.listeners[type];
     switch (type) {
       case Event.eth_accounts: {
-        console.log("web3provider-39-account", data);
-        const account = data.payload?.address;
+        console.log("web3provider-39-account", params);
+        const account = params.payload?.address;
         if (account) {
           res([account]);
         } else {
@@ -45,7 +46,7 @@ export default class Web3Provider {
         break;
       }
       case Event.eth_chainId: {
-        const chainId = data.payload;
+        const chainId = params.payload;
         if (chainId) {
           console.log("web3provider--log", "chainId", chainId);
           res(chainId);
@@ -55,7 +56,7 @@ export default class Web3Provider {
         break;
       }
       case Event.eth_call: {
-        const result = data.payload;
+        const result = params.payload;
         console.log("web3provider-55", result);
         if (result) {
           res(result);
@@ -65,7 +66,7 @@ export default class Web3Provider {
         break;
       }
       case Event.eth_blockNumber: {
-        const blockNumber = data.payload;
+        const blockNumber = params.payload;
         console.log("web3provider-65-blockNumber", blockNumber);
         if (blockNumber) {
           res(blockNumber);
@@ -75,7 +76,7 @@ export default class Web3Provider {
         break;
       }
       case Event.eth_estimateGas: {
-        const gas = data.payload;
+        const gas = params.payload;
         console.log("web3provider-65-gas", gas);
         if (gas) {
           res(gas);
@@ -85,8 +86,18 @@ export default class Web3Provider {
         break;
       }
       case Event.eth_sendTransaction: {
-        const result = data.payload;
-        console.log("web3provider-65-gas", result);
+        const result: any = params.payload;
+        console.log("web3provider-89-result", result);
+        if (result) {
+          res(result);
+        } else {
+          rej("send transaction error");
+        }
+        break;
+      }
+      case Event.eth_getTransactionByHash: {
+        const result: any = params.payload;
+        console.log("web3provider-100-params", params);
         if (result) {
           res(result);
         } else {
