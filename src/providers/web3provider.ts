@@ -11,6 +11,7 @@ enum Event {
   eth_estimateGas = "eth_estimateGas",
   eth_sendTransaction = "eth_sendTransaction",
   eth_getTransactionByHash = "eth_getTransactionByHash",
+  eth_getTransactionReceipt = "eth_getTransactionReceipt",
 }
 
 type callback = (value: any) => void;
@@ -102,6 +103,15 @@ export default class Web3Provider {
           res(result);
         } else {
           rej("send transaction error");
+        }
+        break;
+      }
+      case Event.eth_getTransactionReceipt: {
+        const result: any = params.payload;
+        if (result) {
+          res(result);
+        } else {
+          rej("get transaction receipt error");
         }
         break;
       }

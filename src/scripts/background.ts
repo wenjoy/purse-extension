@@ -10,6 +10,7 @@ enum Event {
   eth_estimateGas = "eth_estimateGas",
   eth_sendTransaction = "eth_sendTransaction",
   eth_getTransactionByHash = "eth_getTransactionByHash",
+  eth_getTransactionReceipt = "eth_getTransactionReceipt",
 }
 
 let walletPricateKey = "";
@@ -174,15 +175,27 @@ chrome.runtime.onMessage.addListener(
     }
 
     if (action === Event.eth_getTransactionByHash) {
-      console.log("background-178-payload", payload);
       const transaction = await provider.getTransaction(payload[0]);
-      console.log("background-179-transaction", transaction);
 
       chrome.tabs.query(
         { active: true, currentWindow: true },
         async (tabs: any) => {
           chrome.tabs.sendMessage(tabs[0].id, {
             type: Event.eth_getTransactionByHash,
+            payload: transaction,
+          });
+        }
+      );
+    }
+
+    if (action === Event.eth_getTransactionReceipt) {
+      const transaction = await provider.getTransactionReceipt(payload[0]);
+
+      chrome.tabs.query(
+        { active: true, currentWindow: true },
+        async (tabs: any) => {
+          chrome.tabs.sendMessage(tabs[0].id, {
+            type: Event.eth_getTransactionReceipt,
             payload: transaction,
           });
         }
