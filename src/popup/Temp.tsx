@@ -2,6 +2,7 @@ import useSWR from "swr";
 
 const err = false;
 
+// NOTE: no comments, don't know what this is doing, why this is here
 export default function Temp() {
   const { data, error } = useSWR("/api/test", (...args) => {
     console.log("args", args);

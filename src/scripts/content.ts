@@ -1,6 +1,6 @@
 function injectScript() {
   const s = document.createElement("script");
-  s.src = chrome.runtime.getURL("inject.js");
+  s.src = chrome.runtime.getURL("inject.js"); // output:  chrome-extension://<extension-id>/inject.js
   s.onload = function () {
     s.remove();
   };

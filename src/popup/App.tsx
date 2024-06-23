@@ -94,6 +94,7 @@ function App() {
     value: address,
   }));
 
+  //NOTE: should wrapper this with a named hooks, now I can't tell what this is doing easily
   useEffect(() => {
     const recoverWalletsFromStore = async () => {
       const { wallets } = await persist.get("wallets");
@@ -125,6 +126,7 @@ function App() {
       setSelectedNetwork(networks[0].value);
     } else {
       const provider = ethers.getDefaultProvider(selectedNetwork, {
+        //TODO: keep api key in a safe place
         alchemy: "YA4l5t9NnZlEYLOF0MqW5Dtmn8xKUOAo",
         etherscan: "C4YT7SIA975H8SYVH51W42MUQG1NENZ2HF",
       });
@@ -184,6 +186,7 @@ function App() {
 
   const creatAccont = async () => {
     const mnemonic = await getMnemonic();
+    //NOTE: BIP-39
     const path = `m/44'/60'/0'/0/${counterRef.current++}`;
     const wallet = generateWallet(mnemonic as string, path);
 
@@ -199,12 +202,12 @@ function App() {
   };
 
   const importAccount = async () => {
-    const trimedPrivateKey = privateKey.trim();
-    if (!trimedPrivateKey) {
+    const trimmedPrivateKey = privateKey.trim();
+    if (!trimmedPrivateKey) {
       alert("private key cann't be empty");
     }
 
-    const wallet = new ethers.Wallet(trimedPrivateKey);
+    const wallet = new ethers.Wallet(trimmedPrivateKey);
     wallets.push({ name: "imported", wallet });
     const dehydratedWallets: DehydratedWallet[] = wallets.map(
       ({ name, wallet }) => ({ name, privateKey: wallet.privateKey })

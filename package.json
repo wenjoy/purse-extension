@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    " // TODO: delete this, this is not working": "",
     "build": "node scripts/bump.js && tsc && vite build",
     "preview": "vite preview",
     "prepare": "husky install",
