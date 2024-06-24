@@ -21,7 +21,7 @@ function App() {
         chrome.tabs.sendMessage(
           tabs[0].id,
           {
-            type: "FROM_POPUP",
+            type: "FROM_CONNECT_PAGE",
             payload: null,
           },
           function (response: any) {
@@ -42,7 +42,7 @@ function App() {
         chrome.tabs.sendMessage(
           tabs[0].id,
           {
-            type: "FROM_POPUP",
+            type: "FROM_CONNECT_PAGE",
             payload: wallet,
           },
           function (response: any) {

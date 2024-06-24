@@ -31,7 +31,7 @@ function startMessageMiddleware() {
       //   console.debug("result", result);
       // }
 
-      // if (event.data.type && event.data.type == "FROM_POPUP") {
+      // if (event.data.type && event.data.type == "FROM_CONNECT_PAGE") {
       //   const { payload } = event.data;
       //   // port.postMessage(event.data.text);
       //   console.debug("result from popup: ", payload);

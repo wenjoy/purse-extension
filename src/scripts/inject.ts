@@ -10,13 +10,18 @@ window.openWallet = ({ message }: { message: string }): Promise => {
     window.addEventListener("message", ({ data, origin, source }) => {
       console.debug("event props: ", data, origin, source);
       if (source != window) {
+        console.debug("interrupt message send from self");
         return;
       }
 
-      if (data.type && data.type == "FROM_POPUP") {
+      if (data.type && data.type == "FROM_CONNECT_PAGE") {
         const { payload: account } = data;
         if (account) {
-          res({ account });
+          //TODO: this is just for quick fix, should not set private key as address
+          res({
+            name: account.name,
+            wallet: { address: account.privateKey.slice(0, 10) },
+          });
         } else {
           rej("No account get");
         }
