@@ -81,6 +81,7 @@ function App() {
   const counterRef = useRef(0);
   const [privateKey, setPrivateKey] = useState<string>("");
 
+  //TODO: why this?
   window.provider = provider;
 
   const networks: Network[] = getNetworks();
@@ -184,7 +185,7 @@ function App() {
     setVisible(false);
   };
 
-  const creatAccont = async () => {
+  const createAccount = async () => {
     const mnemonic = await getMnemonic();
     //NOTE: BIP-39
     const path = `m/44'/60'/0'/0/${counterRef.current++}`;
@@ -232,8 +233,26 @@ function App() {
         <TransactionPage {...{ provider, selectedWallet, selectedNetwork }} />
       ),
     },
-    { name: "Assets", page: <></> },
-    { name: "Setting", page: <></> },
+    {
+      name: "Assets",
+      page: (
+        <>
+          <section className="container flex-1 space-y-4 p-5 flex-col">
+            <h1>This is a placeholder</h1>
+          </section>
+        </>
+      ),
+    },
+    {
+      name: "Setting",
+      page: (
+        <>
+          <section className="container flex-1 space-y-4 p-5 flex-col">
+            <h1>This is a placeholder</h1>
+          </section>
+        </>
+      ),
+    },
   ];
 
   return (
@@ -261,7 +280,7 @@ function App() {
 
       <Drawer visible={visible} onClose={hideDrawer}>
         <div>
-          <button className="btn" onClick={creatAccont}>
+          <button className="btn" onClick={createAccount}>
             Create a new account
           </button>
         </div>

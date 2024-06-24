@@ -31,10 +31,10 @@ type NavbarPanelProps = {
   navbar: Navbar[];
 };
 const NavbarPanel = ({ navbar }: NavbarPanelProps) => {
-  const [actived, setActived] = useState(0);
-  const page = navbar[actived].page;
+  const [activated, setActivated] = useState(0);
+  const page = navbar[activated].page;
   const activeHandler = (index: number) => {
-    setActived(index);
+    setActivated(index);
   };
   return (
     <div className="w-full flex flex-col flex-1">
@@ -46,7 +46,7 @@ const NavbarPanel = ({ navbar }: NavbarPanelProps) => {
             <NavbarItem
               key={name}
               name={name}
-              active={index === actived}
+              active={index === activated}
               onActive={() => activeHandler(index)}
             />
           ))}

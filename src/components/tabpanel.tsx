@@ -130,11 +130,11 @@ const TabPanel = () => {
   const render = () => {
     switch (current) {
       case "Buy":
-        return "Buy";
+        return "This is a placeholder";
       case "Send":
         return <Send />;
       case "Swap":
-        return "Swap";
+        return "This is a placeholder";
     }
   };
 
@@ -148,7 +148,7 @@ const TabPanel = () => {
         ))}
       </div>
 
-      <div className="cotainer">{render()}</div>
+      <div className="container">{render()}</div>
     </div>
   );
 };
