@@ -3,7 +3,8 @@ import Web3Provider from "../providers/web3provider";
 // @ts-ignore
 window.openWallet = ({ message }: { message: string }): Promise => {
   console.debug("get message from page context", message);
-  window.postMessage({ type: "FROM_PAGE", payload: null }, "*");
+  // window.postMessage({ type: "FROM_PAGE", payload: null }, "*");
+  window.postMessage({ action: "OpenPopup", payload: null }, "*");
 
   return new Promise((res, rej) => {
     window.addEventListener("message", ({ data, origin, source }) => {

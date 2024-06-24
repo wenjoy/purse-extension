@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import persist from "../service/persist";
 
 function App() {
-  const [accounts, setAccounts] = useState<any>([]);
+  const [wallets, setWallets] = useState<any>([]);
   const origin = new URLSearchParams(location.search).get("origin");
 
   useEffect(() => {
     async function main() {
-      const { accounts } = await persist.get("accounts");
-      setAccounts(accounts ?? []);
+      const { wallets } = await persist.get("wallets");
+      setWallets(wallets ?? []);
     }
     main();
   }, []);
@@ -43,7 +43,7 @@ function App() {
           tabs[0].id,
           {
             type: "FROM_POPUP",
-            payload: account,
+            payload: wallet,
           },
           function (response: any) {
             console.log("res: ", response);
@@ -54,7 +54,7 @@ function App() {
     );
   };
 
-  const account = accounts[0];
+  const wallet = wallets[0];
 
   return (
     <div className="panel">
@@ -64,7 +64,7 @@ function App() {
       <section>
         <h1 className="text-lg"> Accounts </h1>
         <span>
-          {account?.name} : {account?.wallet.address}
+          {wallet?.name} : {wallet?.privateKey.slice(0, 10)}...
         </span>
       </section>
       <section className="space-x-5 justify-center flex mt-5">
