@@ -64,9 +64,7 @@ const getNetworks = () => {
   const networks = [
     { value: "homestead", name: "homestead" },
     { value: "goerli", name: "goerli" },
-    { value: "matic", name: "matic" },
-    { value: "arbitrum", name: "arbitrum" },
-    { value: "optimism", name: "optimism" },
+    { value: "sepolia", name: "sepolia" },
     { value: "http://localhost:8545", name: "localhost" },
   ];
   return networks;
